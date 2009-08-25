@@ -1,6 +1,6 @@
 /*
 ods_generator: Simple API to generate a ods-like xml file.
-    Copyright (C) 2008, 2009  Daniel Gutson, FuDePAN
+    Copyright (C) 2009  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
 
