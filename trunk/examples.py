@@ -18,11 +18,11 @@
 
 import sys
 
-import ods_generator
+from odfgen.ods_generator import *
 
 # using ODSGenerator directly
 def test1():
-    output = ods_generator.ODSGenerator( sys.stdout )
+    output = ODSGenerator( sys.stdout )
  
     output.begin_spreadsheet();
     output.begin_sheet( "test" );
@@ -43,14 +43,14 @@ def test1():
 
 # using the wrappers
 def test2():
-    with ods_generator.Spreadsheet( sys.stdout ) as spreadsheet:
-        with ods_generator.Sheet( spreadsheet, "sheet1" ) as sheet1:
-            with ods_generator.Row( sheet1 ) as title:
+    with Spreadsheet( sys.stdout ) as spreadsheet:
+        with Sheet( spreadsheet, "sheet1" ) as sheet1:
+            with Row( sheet1 ) as title:
                 title.add_cell( "x" )
                 title.add_cell( "x * 2" )
  
             for i in range( 5 ):
-                with ods_generator.Row( sheet1 ) as row:
+                with Row( sheet1 ) as row:
                     row.add_cell( i )
                     row.add_cell( i * 2 )
 
