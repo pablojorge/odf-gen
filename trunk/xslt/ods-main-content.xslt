@@ -101,7 +101,8 @@
 </xsl:template>
 
 <xsl:template match="chart">
-  <draw:frame>
+  <draw:frame svg:width="{@width}" 
+              svg:height="{@height}">
     <draw:object xlink:href="./{@name}" 
                  xlink:type="simple" 
                  xlink:show="embed" 

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<spreadsheet>
+  <sheet name="sheet1">
+    <row>
+      <cell type="string">x</cell>
+      <cell type="string">x ^ 2</cell>
+    </row>
+    <row>
+      <cell type="float">2</cell>
+      <cell type="float">4</cell>
+    </row>
+    <row>
+      <cell type="float">3</cell>
+      <cell type="float">9</cell>
+    </row>
+    <row>
+      <cell type="float">5</cell>
+      <cell type="float">25</cell>
+    </row>
+    <row>
+      <cell type="float">6</cell>
+      <cell type="float">36</cell>
+    </row>
+    <row>
+      <cell type="float">8</cell>
+      <cell type="float">64</cell>
+    </row>
+    <row>
+      <cell type="object">
+        <chart name="Chart 1" 
+               width="8cm" 
+               height="8cm"
+               range="'sheet1'.A2:'sheet1'.B6">
+          <series name-address="'sheet1'.B1" 
+                  x-range="'sheet1'.A2:'sheet1'.A6" 
+                  y-range="'sheet1'.B2:'sheet1'.B6"/>
+        </chart>
+      </cell>
+    </row>
+  </sheet>
+  <sheet name="Chart 2">
+    <row>
+      <cell type="object">
+        <chart name="Chart 2" 
+               width="8cm" 
+               height="8cm"
+               range="'sheet1'.A2:'sheet1'.B6">
+          <series name-address="'sheet1'.A1" 
+                  x-range="'sheet1'.B2:'sheet1'.B6" 
+                  y-range="'sheet1'.A2:'sheet1'.A6"/>
+        </chart>
+      </cell>
+    </row>
+  </sheet>
+</spreadsheet>
