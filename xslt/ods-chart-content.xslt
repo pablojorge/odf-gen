@@ -33,7 +33,7 @@
   xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" 
   xmlns="http://www.w3.org/1999/xhtml">
 <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
-<xsl:template match="/spreadsheet">
+<xsl:template match="/chart">
 <office:document-content 
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
@@ -65,48 +65,78 @@
   xmlns:field="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:field:1.0" 
   xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" 
   office:version="1.2">
+
+  <office:automatic-styles>
+    <number:number-style style:name="N0">
+      <number:number number:min-integer-digits="1"/>
+    </number:number-style>
+    <style:style style:name="ch1" style:family="chart">
+      <style:graphic-properties draw:stroke="none"/>
+    </style:style>
+    <style:style style:name="ch2" style:family="chart">
+      <style:graphic-properties draw:stroke="none" svg:stroke-color="#b3b3b3" draw:fill="none" draw:fill-color="#e6e6e6"/>
+      <style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+    </style:style>
+    <style:style style:name="ch3" style:family="chart">
+      <style:chart-properties chart:symbol-type="automatic" chart:spline-order="3" chart:sort-by-x-values="false" chart:right-angled-axes="true"/>
+    </style:style>
+    <style:style style:name="ch4" style:family="chart" style:data-style-name="N0">
+      <style:chart-properties chart:display-label="true" chart:logarithmic="false" chart:reverse-direction="false" text:line-break="false"/>
+      <style:graphic-properties svg:stroke-color="#b3b3b3"/>
+      <style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+    </style:style>
+    <style:style style:name="ch5" style:family="chart">
+      <style:graphic-properties svg:stroke-color="#b3b3b3"/>
+    </style:style>
+    <style:style style:name="ch6" style:family="chart">
+      <style:chart-properties chart:symbol-type="named-symbol" chart:symbol-name="square" chart:symbol-width="0.25cm" chart:symbol-height="0.25cm"/>
+      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.088cm" svg:stroke-color="#004586" draw:fill-color="#004586" dr3d:edge-rounding="0%"/>
+      <style:text-properties fo:font-size="6pt" style:font-size-asian="6pt" style:font-size-complex="6pt"/>
+    </style:style>
+    <style:style style:name="ch7" style:family="chart">
+      <style:graphic-properties draw:stroke="solid" svg:stroke-color="#b3b3b3" draw:fill="none" draw:fill-color="#e6e6e6"/>
+    </style:style>
+    <style:style style:name="ch8" style:family="chart">
+      <style:graphic-properties draw:stroke="none" svg:stroke-color="#b3b3b3" draw:fill="solid" draw:fill-color="#cccccc"/>
+    </style:style>
+  </office:automatic-styles>
+
 <office:body>
-<office:spreadsheet>
-<xsl:apply-templates select="sheet"/>
-</office:spreadsheet>
+<office:chart>
+
+  <chart:chart svg:width="{@width}" 
+               svg:height="{@height}" 
+               chart:class="chart:scatter"
+               chart:style-name="ch1">
+    <chart:plot-area chart:style-name="ch3" 
+                     table:cell-range-address="{@range}">
+      <chart:axis chart:dimension="x" 
+                  chart:name="primary-x"
+                  chart:style-name="ch4"/>
+      <chart:axis chart:dimension="y" 
+                  chart:name="primary-y"
+                  chart:style-name="ch4">
+        <chart:grid chart:style-name="ch5" chart:class="major"/>
+      </chart:axis>
+      <xsl:apply-templates select="series"/>
+      <chart:wall chart:style-name="ch7"/>
+      <chart:floor chart:style-name="ch8"/>
+    </chart:plot-area>
+  </chart:chart>
+
+</office:chart>
 </office:body>
 </office:document-content>
 </xsl:template>
 
-<xsl:template match="sheet">
-  <table:table table:name="{@name}">
-    <xsl:apply-templates select="row"/>
-  </table:table>
-</xsl:template>
-
-<xsl:template match="row">
-  <table:table-row>
-    <xsl:for-each select="cell">
-    <xsl:choose>
-      <xsl:when test="@type='object'">
-        <table:table-cell>
-          <xsl:apply-templates select="."/>
-        </table:table-cell>
-      </xsl:when>
-      <xsl:otherwise>
-        <table:table-cell office:value-type="{@type}" office:value="{.}">
-          <text:p>
-            <xsl:value-of select="."/>
-          </text:p>
-        </table:table-cell>
-      </xsl:otherwise>
-    </xsl:choose>
-    </xsl:for-each>
-  </table:table-row>
-</xsl:template>
-
-<xsl:template match="chart">
-  <draw:frame>
-    <draw:object xlink:href="./{@name}" 
-                 xlink:type="simple" 
-                 xlink:show="embed" 
-                 xlink:actuate="onLoad"/>
-  </draw:frame>
+<xsl:template match="series">
+  <chart:series chart:style-name="ch6"
+                chart:values-cell-range-adress="{@y-range}"
+                chart:label-cell-address="{@name-address}"
+                chart:class="chart:scatter">
+    <chart:domain table:cell-range-address="{@x-range}"/>
+    <chart:data-point chart:repeated="6"/>
+  </chart:series>
 </xsl:template>
 
 </xsl:stylesheet>

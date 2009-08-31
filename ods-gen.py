@@ -33,6 +33,17 @@ class Zip:
     def close(self):
         self.__zip.close()
 
+def chart_name(chart):
+    str = '<chart name="'
+    start = chart.find(str)
+
+    if start < 0:
+        raise Exception('Unable to extract the chart name')
+
+    end = chart.find('"', start + len(str))
+
+    return chart[(start + len(str)):end]
+    
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print "usage: %s input.xml output.ods" % (sys.argv[0])
@@ -41,27 +52,35 @@ if __name__ == '__main__':
     input, output = sys.argv[1:]
 
     print "Generating main XML file..."
-    contents = xsltproc('xslt/ods-main-content.xslt', input)
+    content = xsltproc('xslt/ods-main-content.xslt', input)
 
     print "Extracting charts..."
     charts = xsltproc('xslt/ods-extract-charts.xslt', input)
     charts = charts.split('__SEP__')
 
-    objects = []
     print "Generating objects..."
+    objects = []
     for chart in charts:
         if chart and chart != '\n':
-            objects.append(xsltproc('xslt/ods-chart-content.xslt', '-', chart))
+            object = (chart_name(chart),
+                      xsltproc('xslt/ods-chart-content.xslt', '-', chart))
+            objects.append(object)
 
     print "Creating '%s'..." % (output)
     zip = Zip(output)
 
-    print "Adding 'content.xml'..."
-    zip.add_string('content.xml', contents)
-
     print "Adding 'mimetype'..."
     mimetype = 'application/vnd.oasis.opendocument.spreadsheet'
     zip.add_string('mimetype', mimetype)
+
+    print "Adding 'content.xml'..."
+    zip.add_string('content.xml', content)
+
+    for object in objects:
+        path = object[0] + '/content.xml'
+        print "Adding '%s'..." % (path)
+        print object[1]
+        zip.add_string(path, object[1])
 
     manifest = \
     """<?xml version="1.0" encoding="UTF-8"?>
@@ -74,8 +93,23 @@ if __name__ == '__main__':
          <manifest:file-entry 
            manifest:media-type="text/xml" 
            manifest:full-path="content.xml"/>
-         </manifest:manifest>
     """
+
+    for object in objects:
+        manifest += \
+          """<manifest:file-entry 
+               manifest:media-type="text/xml" 
+               manifest:full-path="%s/content.xml"/>
+          """ % (object[0])
+
+        manifest += \
+          """<manifest:file-entry 
+               manifest:media-type="application/vnd.oasis.opendocument.chart" 
+               manifest:full-path="%s/"/>
+          """ % (object[0])
+
+    manifest += \
+    """  </manifest:manifest>"""
 
     print "Adding 'META-INF/manifest.xml'..."
     zip.add_string('META-INF/manifest.xml', manifest)
