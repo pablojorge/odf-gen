@@ -82,13 +82,31 @@
 <xsl:template match="row">
   <table:table-row>
     <xsl:for-each select="cell">
-    <table:table-cell office:value-type="{@type}" office:value="{.}">
-      <text:p>
-        <xsl:value-of select="."/>
-      </text:p>
-    </table:table-cell>
+    <xsl:choose>
+      <xsl:when test="@type='object'">
+        <table:table-cell>
+          <xsl:apply-templates select="."/>
+        </table:table-cell>
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-cell office:value-type="{@type}" office:value="{.}">
+          <text:p>
+            <xsl:value-of select="."/>
+          </text:p>
+        </table:table-cell>
+      </xsl:otherwise>
+    </xsl:choose>
     </xsl:for-each>
   </table:table-row>
+</xsl:template>
+
+<xsl:template match="chart">
+  <draw:frame>
+    <draw:object xlink:href="./{@name}" 
+                 xlink:type="simple" 
+                 xlink:show="embed" 
+                 xlink:actuate="onLoad"/>
+  </draw:frame>
 </xsl:template>
 
 </xsl:stylesheet>
