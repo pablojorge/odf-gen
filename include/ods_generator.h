@@ -371,4 +371,36 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
+class AutoChart : public Chart
+{
+public:
+    AutoChart( const char *name,
+               const char *width,
+               const char *height,
+               const Sheet &sheet )
+        : Chart( name, 
+                 width, 
+                 height, 
+                 CellRange( CellAddress( sheet.get_name(), 1, 2 ),
+                            CellAddress( sheet.get_name(),
+                                         sheet.get_columns(),
+                                         sheet.get_rows() ) ) )
+    {
+        for( int i = 2; i <= sheet.get_columns(); i++ ) 
+        {
+            CellAddress name( sheet.get_name(), i, 1 ),
+                        domain_start( sheet.get_name(), 1, 2 ),
+                        domain_end( sheet.get_name(), 1, sheet.get_rows() ),
+                        values_start( sheet.get_name(), i, 2 ),
+                        values_end( sheet.get_name(), i, sheet.get_rows() );
+            CellRange domain( domain_start, domain_end ),
+                      values( values_start, values_end );
+
+            add_series( Series( name, domain, values ) );
+        }
+    }
+};
+
+MAP_ODS_TYPE(AutoChart, object);
+
 #endif // ODS_GENERATOR_H

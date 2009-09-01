@@ -59,31 +59,7 @@ void test2()
     for( int i = 0; i < 5; i++ )
         Row( sheet1 ) << i << i * i;
 
-    Chart chart1( "chart1",
-                  "8cm",
-                  "8cm",
-                  CellRange( CellAddress( sheet1.get_name(), 
-                                          1, 
-                                          2 ),
-                             CellAddress( sheet1.get_name(), 
-                                          sheet1.get_columns(), 
-                                          sheet1.get_rows() ) ) );
-
-    chart1.add_series( Series( CellAddress( "sheet1", 2, 1 ), 
-                               CellRange( CellAddress( sheet1.get_name(), 
-                                                       1, 
-                                                       2 ),
-                                          CellAddress( sheet1.get_name(), 
-                                                       1, 
-                                                       sheet1.get_rows() ) ),
-                               CellRange( CellAddress( sheet1.get_name(), 
-                                                       2, 
-                                                       2 ),
-                                          CellAddress( sheet1.get_name(), 
-                                                       2, 
-                                                       sheet1.get_rows() ))));
-
-    Row( sheet1 ) << chart1;
+    Row( sheet1 ) << AutoChart( "chart1", "6cm", "10cm", sheet1 );
 }
 
 int main(int argc, char const* argv[])
