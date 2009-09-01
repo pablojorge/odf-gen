@@ -79,7 +79,6 @@ if __name__ == '__main__':
     for object in objects:
         path = object[0] + '/content.xml'
         print "Adding '%s'..." % (path)
-        print object[1]
         zip.add_string(path, object[1])
 
     manifest = \

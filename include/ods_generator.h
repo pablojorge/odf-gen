@@ -116,7 +116,8 @@ private:
     std::ostream &_ostream;
 };
 
-class Spreadsheet {
+class Spreadsheet 
+{
 public:
     Spreadsheet( std::ostream &ostream )
         : _generator( ostream )
@@ -138,13 +139,17 @@ private:
     ODSGenerator _generator;
 };
 
-class Sheet {
+class Sheet 
+{
 public:
     Sheet( Spreadsheet &spreadsheet, 
            const std::string &name )
-        : _generator( spreadsheet.generator() )
+        : _generator( spreadsheet.generator() ),
+          _name( name ),
+          _columns( 0 ),
+          _rows( 0 )
     {
-        _generator.begin_sheet( name );
+        _generator.begin_sheet( _name );
     }
     
     ~Sheet()
@@ -156,16 +161,51 @@ public:
     {
         return _generator;
     }
+
+    const char* get_name() const
+    {
+        return _name.c_str();
+    }
+
+    unsigned int get_columns() const
+    {
+        return _columns;
+    }
+    
+    unsigned int get_rows() const
+    {
+        return _rows;
+    }
+
+    void new_column()
+    {
+        ++_columns;
+    }
+    
+    void new_row()
+    {
+        ++_rows;
+    }
     
 private:
     ODSGenerator &_generator;
+    std::string _name;
+
+    unsigned int _columns,
+                 _rows;
 };
 
-class Row {
+class Row 
+{
 public:
     Row( Sheet &sheet )
-        : _generator( sheet.generator() )
+        : _sheet( sheet ),
+          _generator( _sheet.generator() ),
+          _column( 0 ),
+          _row( 0 )
     {
+        _sheet.new_row();
+        _row = _sheet.get_rows();
         _generator.begin_row();
     }
     
@@ -183,6 +223,9 @@ public:
     void add_cell( const T& value )
     {
         _generator.add_cell( value );
+        ++_column;
+        if( _column > _sheet.get_columns() )
+            _sheet.new_column();
     }
 
     template < class T >
@@ -193,10 +236,15 @@ public:
     }
         
 private:
+    Sheet &_sheet;
     ODSGenerator &_generator;
+
+    unsigned int _column,
+                 _row;
 };
 
-class CellAddress {
+class CellAddress 
+{
 public:
     CellAddress( const char *sheet,
                  unsigned int column,
@@ -223,7 +271,8 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
-class CellRange {
+class CellRange 
+{
 public:
     CellRange( const CellAddress &start,
                const CellAddress &end )
@@ -245,7 +294,8 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
-class Series {
+class Series 
+{
 public:
     Series( const CellAddress& name,
             const CellRange& domain,
@@ -273,7 +323,8 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
-class Chart {
+class Chart 
+{
 public:
     Chart( const char *name,
            const char *width,
