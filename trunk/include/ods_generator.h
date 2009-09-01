@@ -22,6 +22,7 @@ ods_generator: Simple API to generate a ods-like xml file.
 #define ODS_GENERATOR_H
 
 #include <iostream>
+#include <list>
 
 template <class T>
 struct ODSType
@@ -52,11 +53,12 @@ class ODSGenerator
 public:
     ODSGenerator( std::ostream &ostream ) 
         : _ostream( ostream )
-    {}
+    {
+        _ostream << "<?xml version=\"1.0\"?>";
+    }
 
     void begin_spreadsheet()
     {
-        _ostream << "<?xml version=\"1.0\"?>";
         _ostream << "<spreadsheet>";
     }
 
@@ -70,7 +72,8 @@ public:
         _ostream << "<sheet name=\"" << name << "\">";
     }
     
-    void end_sheet() {
+    void end_sheet() 
+    {
         _ostream << "</sheet>";
     }
  
@@ -79,16 +82,34 @@ public:
         _ostream << "<row>";
     }
     
-    void end_row() {
+    void end_row() 
+    {
         _ostream << "</row>";
+    }
+
+    template < class T >
+    void begin_cell()
+    {
+        _ostream << "<cell type=\"" << ODSType< T >::convert() << "\">";
+    }
+
+    void end_cell() 
+    {
+        _ostream << "</cell>";
+    }
+
+    template < class T >
+    void add_value( const T& value )
+    {
+        _ostream << value;
     }
 
     template < class T >
     void add_cell( const T& value )
     {
-        _ostream << "<cell type=\"" << ODSType< T >::convert() << "\">" 
-                 << value 
-                 << "</cell>";
+        begin_cell< T >();
+        add_value( value );
+        end_cell();
     }
         
 private:
@@ -163,9 +184,140 @@ public:
     {
         _generator.add_cell( value );
     }
+
+    template < class T >
+    Row& operator << ( const T& value )
+    {
+        add_cell( value );
+        return *this;
+    }
         
 private:
     ODSGenerator &_generator;
 };
+
+class CellAddress {
+public:
+    CellAddress( const char *sheet,
+                 unsigned int column,
+                 unsigned int row )
+        : _sheet( sheet ),
+          _column( column ),
+          _row( row )
+    {}
+
+    friend std::ostream& operator << ( std::ostream&, const CellAddress& );
+
+private:
+    std::string _sheet;
+    unsigned int _column,
+                 _row;
+};
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const CellAddress& address ) 
+{
+    ostream << "'" << address._sheet << "'" 
+            << "." << (char)('A' + address._column - 1) // XXX
+            << address._row;
+    return ostream;
+}
+
+class CellRange {
+public:
+    CellRange( const CellAddress &start,
+               const CellAddress &end )
+        : _start( start ),
+          _end( end )
+    {}
+
+    friend std::ostream& operator << ( std::ostream&, const CellRange& );
+
+private:
+    CellAddress _start,
+                _end;
+};
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const CellRange& range ) 
+{
+    ostream << range._start << ":" << range._end;
+    return ostream;
+}
+
+class Series {
+public:
+    Series( const CellAddress& name,
+            const CellRange& domain,
+            const CellRange& values )
+        : _name( name ),
+          _domain( domain ),
+          _values( values )
+    {}
+
+    friend std::ostream& operator << ( std::ostream&, const Series& );
+
+private:
+    CellAddress _name;
+    CellRange _domain,
+              _values;
+};
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const Series& series ) 
+{
+    ostream << "<series name-address=\"" << series._name << "\""
+            << "        x-range=\"" << series._domain << "\""
+            << "        y-range=\"" << series._values << "\""
+            << "/>";
+    return ostream;
+}
+
+class Chart {
+public:
+    Chart( const char *name,
+           const char *width,
+           const char *height,
+           const CellRange &range )
+        : _name( name ),
+          _width( width ),
+          _height( height ),
+          _range( range )
+    {}
+
+    void add_series( const Series &series )
+    {
+        _list.push_back( series );
+    }
+
+    friend std::ostream& operator << ( std::ostream&, const Chart& );
+
+private:
+    std::string _name,
+                _width,
+                _height;
+    CellRange _range;
+
+    std::list< Series > _list;
+};
+
+MAP_ODS_TYPE(Chart, object);
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const Chart& chart ) 
+{
+    ostream << "<chart name=\"" << chart._name << "\""
+            << "       width=\"" << chart._width << "\""
+            << "       height=\"" << chart._height << "\""
+            << "       range=\"" << chart._range << "\">";
+
+    for( std::list< Series >::const_iterator it = chart._list.begin();
+         it != chart._list.end();
+         it++ )
+        ostream << *it;
+
+    ostream << "</chart>";
+    return ostream;
+}
 
 #endif // ODS_GENERATOR_H
