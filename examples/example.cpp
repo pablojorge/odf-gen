@@ -54,19 +54,24 @@ void test2()
 
     Sheet sheet1( spreadsheet, "sheet1" );
     
-    {
-        Row title( sheet1 );
-        title.add_cell( "x" );
-        title.add_cell( "x * 2" );
-    }
+    Row( sheet1 ) << "x" << "f(x) = x ^ 2";
  
     for( int i = 0; i < 5; i++ )
-    {
-        Row row( sheet1 );
-        
-        row.add_cell( i );
-        row.add_cell( i * 2 );
-    }
+        Row( sheet1 ) << i << i * i;
+
+    Chart chart1( "chart1",
+                  "8cm",
+                  "8cm",
+                  CellRange( CellAddress( "sheet1", 1, 2 ),
+                             CellAddress( "sheet1", 2, 6 ) ) );
+
+    chart1.add_series( Series( CellAddress( "sheet1", 2, 1 ), 
+                               CellRange( CellAddress( "sheet1", 1, 2 ),
+                                          CellAddress( "sheet1", 1, 6 ) ),
+                               CellRange( CellAddress( "sheet1", 2, 2 ),
+                                          CellAddress( "sheet1", 2, 6 ) ) ) );
+
+    Row( sheet1 ) << chart1;
 }
 
 int main(int argc, char const* argv[])
