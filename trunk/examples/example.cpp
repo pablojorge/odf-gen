@@ -62,14 +62,26 @@ void test2()
     Chart chart1( "chart1",
                   "8cm",
                   "8cm",
-                  CellRange( CellAddress( "sheet1", 1, 2 ),
-                             CellAddress( "sheet1", 2, 6 ) ) );
+                  CellRange( CellAddress( sheet1.get_name(), 
+                                          1, 
+                                          2 ),
+                             CellAddress( sheet1.get_name(), 
+                                          sheet1.get_columns(), 
+                                          sheet1.get_rows() ) ) );
 
     chart1.add_series( Series( CellAddress( "sheet1", 2, 1 ), 
-                               CellRange( CellAddress( "sheet1", 1, 2 ),
-                                          CellAddress( "sheet1", 1, 6 ) ),
-                               CellRange( CellAddress( "sheet1", 2, 2 ),
-                                          CellAddress( "sheet1", 2, 6 ) ) ) );
+                               CellRange( CellAddress( sheet1.get_name(), 
+                                                       1, 
+                                                       2 ),
+                                          CellAddress( sheet1.get_name(), 
+                                                       1, 
+                                                       sheet1.get_rows() ) ),
+                               CellRange( CellAddress( sheet1.get_name(), 
+                                                       2, 
+                                                       2 ),
+                                          CellAddress( sheet1.get_name(), 
+                                                       2, 
+                                                       sheet1.get_rows() ))));
 
     Row( sheet1 ) << chart1;
 }
