@@ -70,72 +70,112 @@
     <number:number-style style:name="N0">
       <number:number number:min-integer-digits="1"/>
     </number:number-style>
-    <style:style style:name="ch1" style:family="chart">
+    <style:style style:name="chart-style" 
+                  style:family="chart">
       <style:graphic-properties draw:stroke="none"/>
     </style:style>
-    <style:style style:name="ch2" style:family="chart">
-      <style:graphic-properties draw:stroke="none" svg:stroke-color="#b3b3b3" draw:fill="none" draw:fill-color="#e6e6e6"/>
-      <style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+    <style:style style:name="legend-style" 
+                 style:family="chart">
+      <style:graphic-properties draw:stroke="none" 
+                                svg:stroke-color="#b3b3b3" 
+                                draw:fill="none" 
+                                draw:fill-color="#e6e6e6"/>
+      <style:text-properties fo:font-size="8pt" 
+                             style:font-size-asian="8pt" 
+                             style:font-size-complex="8pt"/>
     </style:style>
-    <style:style style:name="ch3" style:family="chart">
-      <style:chart-properties chart:symbol-type="automatic" chart:spline-order="3" chart:sort-by-x-values="false" chart:right-angled-axes="true"/>
+    <style:style style:name="plot-area-style" 
+                 style:family="chart">
+      <style:chart-properties chart:symbol-type="automatic" 
+                              chart:spline-order="3" 
+                              chart:sort-by-x-values="false" 
+                              chart:right-angled-axes="true"/>
     </style:style>
-    <style:style style:name="ch4" style:family="chart" style:data-style-name="N0">
-      <style:chart-properties chart:display-label="true" chart:logarithmic="false" chart:reverse-direction="false" text:line-break="false"/>
+    <style:style style:name="axis-style" 
+                 style:family="chart" 
+                 style:data-style-name="N0">
+      <style:chart-properties chart:display-label="true" 
+                              chart:logarithmic="false" 
+                              chart:reverse-direction="false" 
+                              text:line-break="false"/>
       <style:graphic-properties svg:stroke-color="#b3b3b3"/>
-      <style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+      <style:text-properties fo:font-size="8pt" 
+                             style:font-size-asian="8pt" 
+                             style:font-size-complex="8pt"/>
     </style:style>
-    <style:style style:name="ch5" style:family="chart">
+    <style:style style:name="grid-style" 
+                 style:family="chart">
       <style:graphic-properties svg:stroke-color="#b3b3b3"/>
     </style:style>
-    <style:style style:name="ch6" style:family="chart">
-      <style:chart-properties chart:symbol-type="named-symbol" chart:symbol-name="square" chart:symbol-width="0.25cm" chart:symbol-height="0.25cm"/>
-      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.088cm" svg:stroke-color="#004586" draw:fill-color="#004586" dr3d:edge-rounding="0%"/>
-      <style:text-properties fo:font-size="6pt" style:font-size-asian="6pt" style:font-size-complex="6pt"/>
+    <style:style style:name="wall-style" 
+                 style:family="chart">
+      <style:graphic-properties draw:stroke="solid" 
+                                svg:stroke-color="#b3b3b3" 
+                                draw:fill="none" 
+                                draw:fill-color="#e6e6e6"/>
     </style:style>
-    <style:style style:name="ch7" style:family="chart">
-      <style:graphic-properties draw:stroke="solid" svg:stroke-color="#b3b3b3" draw:fill="none" draw:fill-color="#e6e6e6"/>
+    <style:style style:name="floor-style" 
+                 style:family="chart">
+      <style:graphic-properties draw:stroke="none" 
+                                svg:stroke-color="#b3b3b3" 
+                                draw:fill="solid" 
+                                draw:fill-color="#cccccc"/>
     </style:style>
-    <style:style style:name="ch8" style:family="chart">
-      <style:graphic-properties draw:stroke="none" svg:stroke-color="#b3b3b3" draw:fill="solid" draw:fill-color="#cccccc"/>
-    </style:style>
+    <xsl:for-each select="series">
+      <style:style style:name="{@name-address}-style" 
+                   style:family="chart">
+        <style:chart-properties chart:symbol-type="named-symbol" 
+                                chart:symbol-name="square" 
+                                chart:symbol-width="0.1cm" 
+                                chart:symbol-height="0.1cm"/>
+        <style:graphic-properties draw:stroke="solid" 
+                                  svg:stroke-width="0.05cm" 
+                                  svg:stroke-color="{@color}" 
+                                  draw:fill-color="{@color}" 
+                                  dr3d:edge-rounding="0%"/>
+        <style:text-properties fo:font-size="6pt" 
+                               style:font-size-asian="6pt" 
+                               style:font-size-complex="6pt"/>
+      </style:style>
+    </xsl:for-each>
   </office:automatic-styles>
 
 <office:body>
 <office:chart>
-
   <chart:chart svg:width="{@width}" 
                svg:height="{@height}" 
                chart:class="chart:scatter"
-               chart:style-name="ch1">
-    <chart:plot-area chart:style-name="ch3" 
-                     table:cell-range-address="{@range}">
+               chart:style-name="chart-style">
+    <chart:legend chart:legend-position="end" 
+                  chart:style-name="legend-style"/>
+    <chart:plot-area chart:style-name="plot-area-style" 
+                     table:cell-range-address="{@range}"
+                     chart:data-source-has-labels="row">
       <chart:axis chart:dimension="x" 
                   chart:name="primary-x"
-                  chart:style-name="ch4"/>
+                  chart:style-name="axis-style"/>
       <chart:axis chart:dimension="y" 
                   chart:name="primary-y"
-                  chart:style-name="ch4">
-        <chart:grid chart:style-name="ch5" chart:class="major"/>
+                  chart:style-name="axis-style">
+        <chart:grid chart:style-name="grid-style" 
+                    chart:class="major"/>
       </chart:axis>
       <xsl:apply-templates select="series"/>
-      <chart:wall chart:style-name="ch7"/>
-      <chart:floor chart:style-name="ch8"/>
+      <chart:wall chart:style-name="wall-style"/>
+      <chart:floor chart:style-name="floor-style"/>
     </chart:plot-area>
   </chart:chart>
-
 </office:chart>
 </office:body>
 </office:document-content>
 </xsl:template>
 
 <xsl:template match="series">
-  <chart:series chart:style-name="ch6"
+  <chart:series chart:style-name="{@name-address}-style"
                 chart:values-cell-range-adress="{@y-range}"
                 chart:label-cell-address="{@name-address}"
                 chart:class="chart:scatter">
     <chart:domain table:cell-range-address="{@x-range}"/>
-    <chart:data-point chart:repeated="6"/>
   </chart:series>
 </xsl:template>
 

@@ -54,15 +54,18 @@ void test2()
 
     Sheet sheet1( spreadsheet, "sheet1" );
     
-    Row( sheet1 ) << "x" << "f(x) = x ^ 2";
+    Row( sheet1 ) << "x" << "f(x) = x ^ 2" << "f(x) = 2x" << "f(x) = -5x";
  
-    for( int i = 0; i < 5; i++ )
-        Row( sheet1 ) << i << i * i;
+    for( int x = -10; x <= 10; x++ )
+        Row( sheet1 ) << x << x * x << x * 2 << x * -5;
 
-    Row( sheet1 ) << AutoChart( "chart1", "6cm", "10cm", sheet1 );
+    Row( sheet1 ) << AutoChart( "chart1",   // name
+                                "14cm",     // width
+                                "10cm",     // height
+                                sheet1 );   // sheet to extract series from
 }
 
-int main(int argc, char const* argv[])
+int main( int argc, char const* argv[] )
 {
     test2();
     return 0;
