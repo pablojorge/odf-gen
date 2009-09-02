@@ -22,7 +22,9 @@ ods_generator: Simple API to generate a ods-like xml file.
 #define ODS_GENERATOR_H
 
 #include <iostream>
+#include <iomanip>
 #include <list>
+#include <cstdlib>
 
 template <class T>
 struct ODSType
@@ -294,15 +296,54 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
+class Color
+{
+public:
+    Color( unsigned char red,
+           unsigned char green,
+           unsigned char blue )
+        : _red( red ),
+          _green( green ),
+          _blue( blue )
+    {}
+
+    Color( unsigned int color )
+        : _red( color >> 16 ),
+          _green( color >> 8 ),
+          _blue( color )
+    {}
+
+    friend std::ostream& operator << ( std::ostream&, const Color& );
+
+private:
+    unsigned char _red,
+                  _green,
+                  _blue;
+};
+
+std::ostream& operator << ( std::ostream &ostream, const Color& color ) 
+{
+    ostream << "#" 
+            << std::hex 
+            << std::setfill('0') 
+            << std::setw(2) << static_cast< int >( color._red )
+            << std::setw(2) << static_cast< int >( color._green )
+            << std::setw(2) << static_cast< int >( color._blue )
+            << std::dec;
+    return ostream;
+}
+
 class Series 
 {
 public:
     Series( const CellAddress& name,
             const CellRange& domain,
-            const CellRange& values )
+            const CellRange& values,
+            const Color& color )
         : _name( name ),
           _domain( domain ),
-          _values( values )
+          _values( values ),
+          _color( color )
     {}
 
     friend std::ostream& operator << ( std::ostream&, const Series& );
@@ -311,6 +352,7 @@ private:
     CellAddress _name;
     CellRange _domain,
               _values;
+    Color _color;
 };
 
 std::ostream& operator << ( std::ostream &ostream,
@@ -319,6 +361,7 @@ std::ostream& operator << ( std::ostream &ostream,
     ostream << "<series name-address=\"" << series._name << "\""
             << "        x-range=\"" << series._domain << "\""
             << "        y-range=\"" << series._values << "\""
+            << "        color=\"" << series._color << "\""
             << "/>";
     return ostream;
 }
@@ -381,12 +424,14 @@ public:
         : Chart( name, 
                  width, 
                  height, 
-                 CellRange( CellAddress( sheet.get_name(), 1, 2 ),
+                 CellRange( CellAddress( sheet.get_name(), 1, 1 ),
                             CellAddress( sheet.get_name(),
                                          sheet.get_columns(),
                                          sheet.get_rows() ) ) )
     {
-        for( int i = 2; i <= sheet.get_columns(); i++ ) 
+        srandom( time( NULL ) );
+
+        for( unsigned int i = 2; i <= sheet.get_columns(); i++ ) 
         {
             CellAddress name( sheet.get_name(), i, 1 ),
                         domain_start( sheet.get_name(), 1, 2 ),
@@ -395,8 +440,9 @@ public:
                         values_end( sheet.get_name(), i, sheet.get_rows() );
             CellRange domain( domain_start, domain_end ),
                       values( values_start, values_end );
+            Color color( random() );
 
-            add_series( Series( name, domain, values ) );
+            add_series( Series( name, domain, values, color ) );
         }
     }
 };
