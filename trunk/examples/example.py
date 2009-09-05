@@ -28,14 +28,14 @@ def test1():
     output.begin_sheet( "test" );
     
     output.begin_row();
-    output.add_string( "x" );
-    output.add_string( "x * 2" );
+    output.add_cell( "x" );
+    output.add_cell( "x * 2" );
     output.end_row();
  
     for i in range( 5 ):
         output.begin_row();
-        output.add_number( i );
-        output.add_number( i * 2 );
+        output.add_cell( i );
+        output.add_cell( i * 2 );
         output.end_row();
 
     output.end_sheet();
@@ -45,17 +45,15 @@ def test1():
 def test2():
     with Spreadsheet() as spreadsheet:
         with Sheet( spreadsheet, "sheet1" ) as sheet1:
-            with Row( sheet1 ) as title:
-                title.add_string( "x" )
-                title.add_string( "x * 2" )
- 
+            sheet1.add_row(["x", "x * 2"])
+
             for i in range( 5 ):
-                with Row( sheet1 ) as row:
-                    row.add_number( i )
-                    row.add_number( i * 2 )
-                    
-            with Row( sheet1 ) as row:
-                row.add_chart(AutoChart("chart1", "8cm", "8cm", sheet1))
+                sheet1.add_row([i, i * 2])
+
+            sheet1.add_row([AutoChart("chart1", 
+                                      "8cm", 
+                                      "8cm", 
+                                      sheet1)])
 
 if __name__ == "__main__":
     test2()
