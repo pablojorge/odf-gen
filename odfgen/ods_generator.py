@@ -19,7 +19,25 @@
 from ods_generator_ import *
 
 class ODSGenerator(ODSGenerator_):
-    pass
+    @staticmethod
+    def type_map( value ):
+        type_mapping = [
+            ([int, float], "add_number"),
+            ([str], "add_string"),
+            ([Chart, AutoChart], "add_chart")
+        ]
+
+        method = reduce(lambda o, p: p[1] if type(value) in p[0] else o, 
+                        type_mapping, 
+                        None)
+
+        if not method:
+            raise Exception("Unable to map type '%s'" % (type(value)))
+
+        return method
+    
+    def add_cell( self, value ):
+        getattr(self, ODSGenerator.type_map(value))(value)
 
 class Spreadsheet(Spreadsheet_):
     def __enter__( self ):
@@ -37,6 +55,11 @@ class Sheet(Sheet_):
     
     def __exit__( self, type, value, traceback ):
         self.close()
+        
+    def add_row( self, l ):
+        with Row( self ) as row:
+            for v in l:
+                row.add_cell(v)
 
 class Row(Row_):
     def __init__( self, sheet ):
@@ -47,6 +70,12 @@ class Row(Row_):
     
     def __exit__( self, type, value, traceback ):
         self.close()
+
+    def add_cell( self, value ):
+        getattr(self, ODSGenerator.type_map(value))(value)
+
+class Chart(Chart_):
+    pass
 
 class AutoChart(AutoChart_):
     pass
