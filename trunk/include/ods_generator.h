@@ -30,6 +30,10 @@ template <class T>
 struct ODSType
 {};
 
+template <class T>
+struct ODSType<const T&> : public ODSType<T>
+{};
+
 #define MAP_ODS_TYPE(cpptype, odstype) \
 template<> \
 struct ODSType<cpptype> \
@@ -53,7 +57,7 @@ struct ODSType<char[N]>
 class ODSGenerator 
 {
 public:
-    ODSGenerator( std::ostream &ostream ) 
+    ODSGenerator( std::ostream &ostream = std::cout ) 
         : _ostream( ostream )
     {
         _ostream << "<?xml version=\"1.0\"?>";
@@ -118,18 +122,59 @@ private:
     std::ostream &_ostream;
 };
 
+template < class Container >
+class TagHandler
+{
+public:
+    TagHandler( Container& container ) 
+        : _container( container ),
+          _closed( false )
+    {
+        open();
+    }
+    
+    ~TagHandler()
+    {
+        close();
+    } 
+    
+    void open() {
+        _container.open_();
+    }
+    
+    void close() {
+        if( !_closed ) {
+            _container.close_();
+            _closed = true;
+        }
+    }
+    
+private:
+    Container& _container;
+    bool _closed;
+};
+
 class Spreadsheet 
 {
 public:
-    Spreadsheet( std::ostream &ostream )
-        : _generator( ostream )
+    Spreadsheet( std::ostream &ostream = std::cout )
+        : _generator( ostream ),
+          _handler( *this )
+    {}
+    
+    void open_()
     {
         _generator.begin_spreadsheet();
     }
     
-    ~Spreadsheet()
+    void close_()
     {
         _generator.end_spreadsheet();
+    }
+    
+    void close()
+    {
+        _handler.close();
     }
 
     ODSGenerator &generator()
@@ -139,6 +184,7 @@ public:
     
 private:
     ODSGenerator _generator;
+    TagHandler< Spreadsheet > _handler;
 };
 
 class Sheet 
@@ -149,14 +195,23 @@ public:
         : _generator( spreadsheet.generator() ),
           _name( name ),
           _columns( 0 ),
-          _rows( 0 )
+          _rows( 0 ),
+          _handler( *this )
+    {}
+    
+    void open_()
     {
         _generator.begin_sheet( _name );
     }
     
-    ~Sheet()
+    void close_()
     {
         _generator.end_sheet();
+    }
+
+    void close()
+    {
+        _handler.close();
     }
 
     ODSGenerator &generator()
@@ -179,12 +234,12 @@ public:
         return _rows;
     }
 
-    void new_column()
+    void add_column()
     {
         ++_columns;
     }
     
-    void new_row()
+    void add_row()
     {
         ++_rows;
     }
@@ -195,6 +250,8 @@ private:
 
     unsigned int _columns,
                  _rows;
+
+    TagHandler< Sheet > _handler;
 };
 
 class Row 
@@ -204,16 +261,25 @@ public:
         : _sheet( sheet ),
           _generator( _sheet.generator() ),
           _column( 0 ),
-          _row( 0 )
+          _row( 0 ),
+          _handler( *this )
+    {}
+    
+    void open_()
     {
-        _sheet.new_row();
+        _sheet.add_row();
         _row = _sheet.get_rows();
         _generator.begin_row();
     }
     
-    ~Row()
+    void close_()
     {
         _generator.end_row();
+    }
+    
+    void close()
+    {
+        _handler.close();
     }
 
     ODSGenerator &generator()
@@ -227,7 +293,7 @@ public:
         _generator.add_cell( value );
         ++_column;
         if( _column > _sheet.get_columns() )
-            _sheet.new_column();
+            _sheet.add_column();
     }
 
     template < class T >
@@ -243,12 +309,14 @@ private:
 
     unsigned int _column,
                  _row;
+                 
+    TagHandler< Row > _handler;
 };
 
 class CellAddress 
 {
 public:
-    CellAddress( const char *sheet,
+    CellAddress( const std::string &sheet,
                  unsigned int column,
                  unsigned int row )
         : _sheet( sheet ),
@@ -369,9 +437,9 @@ std::ostream& operator << ( std::ostream &ostream,
 class Chart 
 {
 public:
-    Chart( const char *name,
-           const char *width,
-           const char *height,
+    Chart( const std::string &name,
+           const std::string &width,
+           const std::string &height,
            const CellRange &range )
         : _name( name ),
           _width( width ),
@@ -417,9 +485,9 @@ std::ostream& operator << ( std::ostream &ostream,
 class AutoChart : public Chart
 {
 public:
-    AutoChart( const char *name,
-               const char *width,
-               const char *height,
+    AutoChart( const std::string &name,
+               const std::string &width,
+               const std::string &height,
                const Sheet &sheet )
         : Chart( name, 
                  width, 

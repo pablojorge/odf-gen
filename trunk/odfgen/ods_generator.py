@@ -16,85 +16,38 @@
 # You should have received a copy of the GNU General Public License
 # along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 
-class ODSGenerator:
-    def __init__( self, output ):
-        self.__output = output
+from ods_generator_ import *
 
-    def begin_spreadsheet( self ):
-        self.__output.write("<?xml version=\"1.0\"?>")
-        self.__output.write("<spreadsheet>")
+class ODSGenerator(ODSGenerator_):
+    pass
 
-    def end_spreadsheet( self ):
-        self.__output.write("</spreadsheet>")
-        
-    def begin_sheet( self, name ):
-        self.__output.write( "<sheet name=\"" + str(name) + "\">" )
-    
-    def end_sheet( self ):
-        self.__output.write( "</sheet>" )
- 
-    def begin_row( self ):
-        self.__output.write( "<row>" )
-    
-    def end_row( self ):
-        self.__output.write( "</row>" )
-
-    def add_cell( self, value ):
-        type_mapping = [
-            ([int, float], "float"),
-            ([str], "string")
-        ]
-
-        ods_type = reduce(lambda o, p: p[1] if type(value) in p[0] else o, 
-                          type_mapping, 
-                          None)
-
-        if not ods_type:
-            raise Exception("Unknown type")
-
-        self.__output.write( "<cell type=\"" + ods_type + "\">" +
-                             str(value) +
-                             "</cell>" );
-        
-class Spreadsheet:
-    def __init__( self, output ):
-        self.__generator = ODSGenerator( output )
-
+class Spreadsheet(Spreadsheet_):
     def __enter__( self ):
-        self.__generator.begin_spreadsheet()
         return self
     
     def __exit__( self, type, value, traceback ):
-        self.__generator.end_spreadsheet()
+        self.close()
 
-    def generator( self ):
-        return self.__generator
-    
-class Sheet:
+class Sheet(Sheet_):
     def __init__( self, spreadsheet, name ):
-        self.__generator = spreadsheet.generator()
-        self.__name = name
+        Sheet_.__init__( self, spreadsheet, name )
 
     def __enter__( self ):
-        self.__generator.begin_sheet( self.__name );
         return self
     
     def __exit__( self, type, value, traceback ):
-        self.__generator.end_sheet()
+        self.close()
 
-    def generator( self ):
-        return self.__generator
-    
-class Row:
+class Row(Row_):
     def __init__( self, sheet ):
-        self.__generator = sheet.generator()
+        Row_.__init__( self, sheet )
 
     def __enter__( self ):
-        self.__generator.begin_row()
         return self
     
     def __exit__( self, type, value, traceback ):
-        self.__generator.end_row()
-        
-    def add_cell( self, value ):
-        self.__generator.add_cell( value )
+        self.close()
+
+class AutoChart(AutoChart_):
+    pass
+
