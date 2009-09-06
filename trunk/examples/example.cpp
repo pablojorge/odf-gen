@@ -25,7 +25,7 @@ ods_generator: Simple API to generate a ods-like xml file.
 // using ODSGenerator directly
 void test1() 
 {
-    ODSGenerator output( std::cout );
+    ODSGenerator output;
  
     output.begin_spreadsheet();
     output.begin_sheet( "test" );
@@ -50,7 +50,7 @@ void test1()
 // using the wrappers
 void test2() 
 {
-    Spreadsheet spreadsheet( std::cout );
+    Spreadsheet spreadsheet;
 
     Sheet sheet1( spreadsheet, "sheet1" );
     
