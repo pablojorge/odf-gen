@@ -172,7 +172,7 @@
 
 <xsl:template match="series">
   <chart:series chart:style-name="{@name-address}-style"
-                chart:values-cell-range-adress="{@y-range}"
+                chart:values-cell-range-address="{@y-range}"
                 chart:label-cell-address="{@name-address}"
                 chart:class="chart:scatter">
     <chart:domain table:cell-range-address="{@x-range}"/>

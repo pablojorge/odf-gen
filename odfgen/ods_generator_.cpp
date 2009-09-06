@@ -91,10 +91,26 @@ BOOST_PYTHON_MODULE(ods_generator_)
         .def("add_chart", &Row::add_cell<const Chart&>)
     ;
     
+    class_<Color>("Color_", init<unsigned char,
+                                 unsigned char,
+                                 unsigned char>())
+    ;
+    
+    class_<ColorGenerator>("ColorGenerator_")
+        .def("next", &ColorGenerator::next)
+    ;
+    
+    class_<Series>("Series_", init<const CellAddress&,
+                                   const CellRange&,
+                                   const CellRange&,
+                                   const Color&>())
+    ;
+    
     class_<Chart>("Chart_", init<const std::string&,
                                  const std::string&,
-                                 const std::string&,
-                                 const CellRange&>())
+                                 const std::string&>())
+        .def("add_range", &Chart::add_range)
+        .def("add_series", &Chart::add_series)
     ;
     
     class_<AutoChart,

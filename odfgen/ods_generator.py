@@ -72,7 +72,16 @@ class Row(Row_):
         self.close()
 
     def add_cell( self, value ):
-        getattr(self, ODSGenerator.type_map(value))(value)
+        return getattr(self, ODSGenerator.type_map(value))(value)
+
+class Color(Color_):
+    pass
+
+class ColorGenerator(ColorGenerator_):
+    pass
+
+class Series(Series_):
+    pass
 
 class Chart(Chart_):
     pass
