@@ -22,6 +22,8 @@ ods_generator: Simple API to generate a ods-like xml file.
 #define ODS_GENERATOR_H
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <iomanip>
 #include <list>
 #include <cstdlib>
@@ -54,10 +56,72 @@ struct ODSType<char[N]>
     static const char* convert() { return "string"; }
 };
 
+class OutputStream
+{
+public:
+    virtual std::ostream& stream() {}
+};
+
+template < class T >
+OutputStream& operator << ( OutputStream& stream, const T& value )
+{
+    stream.stream() << value;
+    return stream;
+}
+
+class StdOut : public OutputStream
+{
+public:
+    std::ostream& stream()
+    {
+        return std::cout;
+    }
+};
+
+StdOut stdout_;
+
+class StringStream : public OutputStream
+{
+public:
+    std::ostream& stream()
+    {
+        return _stream;
+    }
+
+    std::string str() const
+    {
+        return _stream.str();
+    }
+
+private:
+    std::stringstream _stream;
+};
+
+class File : public OutputStream
+{
+public:
+    File( const std::string& name )
+        : _stream( name.c_str() )
+    {}
+
+    std::ostream& stream()
+    {
+        return _stream;
+    }
+    
+    void close()
+    {
+        _stream.close();
+    }
+
+private:
+    std::ofstream _stream;
+};
+
 class ODSGenerator 
 {
 public:
-    ODSGenerator( std::ostream &ostream = std::cout ) 
+    ODSGenerator( OutputStream &ostream = stdout_ ) 
         : _ostream( ostream )
     {
         _ostream << "<?xml version=\"1.0\"?>";
@@ -119,7 +183,7 @@ public:
     }
         
 private:
-    std::ostream &_ostream;
+    OutputStream &_ostream;
 };
 
 template < class Container >
@@ -157,7 +221,7 @@ private:
 class Spreadsheet 
 {
 public:
-    Spreadsheet( std::ostream &ostream = std::cout )
+    Spreadsheet( OutputStream &ostream = stdout_ )
         : _generator( ostream ),
           _handler( *this )
     {}

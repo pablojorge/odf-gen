@@ -26,7 +26,28 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(ods_generator_)
 {
-    class_<ODSGenerator>("ODSGenerator_")
+    class_<OutputStream>("OutputStream")
+    ;
+
+    class_<StdOut,
+           bases<OutputStream>,
+           boost::noncopyable>("StdOut")
+    ;
+
+    class_<StringStream,
+           bases<OutputStream>,
+           boost::noncopyable>("StringStream")
+        .def("str", &StringStream::str)
+    ;
+
+    class_<File,
+           bases<OutputStream>,
+           boost::noncopyable>("File", init<const std::string&>())
+        .def("close", &File::close) 
+    ;
+
+    class_<ODSGenerator>("ODSGenerator_", 
+                         init<OutputStream&>())
         .def("begin_spreadsheet", &ODSGenerator::begin_spreadsheet)
         .def("end_spreadsheet", &ODSGenerator::end_spreadsheet)
         .def("begin_sheet", &ODSGenerator::begin_sheet)
@@ -38,7 +59,8 @@ BOOST_PYTHON_MODULE(ods_generator_)
         .def("add_chart", &ODSGenerator::add_cell<const Chart&>)
     ;
     
-    class_<Spreadsheet>("Spreadsheet_")
+    class_<Spreadsheet>("Spreadsheet_",
+                        init<OutputStream&>())
         .def("close", &Spreadsheet::close)
     ;
     

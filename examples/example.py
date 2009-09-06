@@ -43,7 +43,9 @@ def test1():
 
 # using the wrappers
 def test2():
-    with Spreadsheet() as spreadsheet:
+    stream = StringStream()
+
+    with Spreadsheet( stream ) as spreadsheet:
         with Sheet( spreadsheet, "sheet1" ) as sheet1:
             sheet1.add_row(["x", "x * 2"])
 
@@ -54,6 +56,8 @@ def test2():
                                       "8cm", 
                                       "8cm", 
                                       sheet1)])
+
+    print stream.str()
 
 if __name__ == "__main__":
     test2()
