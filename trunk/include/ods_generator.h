@@ -318,65 +318,6 @@ private:
     TagHandler< Sheet > _handler;
 };
 
-class Row 
-{
-public:
-    Row( Sheet &sheet )
-        : _sheet( sheet ),
-          _generator( _sheet.generator() ),
-          _column( 0 ),
-          _row( 0 ),
-          _handler( *this )
-    {}
-    
-    void open_()
-    {
-        _sheet.add_row();
-        _row = _sheet.get_rows();
-        _generator.begin_row();
-    }
-    
-    void close_()
-    {
-        _generator.end_row();
-    }
-    
-    void close()
-    {
-        _handler.close();
-    }
-
-    ODSGenerator &generator()
-    {
-        return _generator;
-    }
-    
-    template < class T >
-    void add_cell( const T& value )
-    {
-        _generator.add_cell( value );
-        ++_column;
-        if( _column > _sheet.get_columns() )
-            _sheet.add_column();
-    }
-
-    template < class T >
-    Row& operator << ( const T& value )
-    {
-        add_cell( value );
-        return *this;
-    }
-        
-private:
-    Sheet &_sheet;
-    ODSGenerator &_generator;
-
-    unsigned int _column,
-                 _row;
-                 
-    TagHandler< Row > _handler;
-};
-
 class CellAddress 
 {
 public:
@@ -427,6 +368,71 @@ std::ostream& operator << ( std::ostream &ostream,
     ostream << range._start << ":" << range._end;
     return ostream;
 }
+
+class Row 
+{
+public:
+    Row( Sheet &sheet )
+        : _sheet( sheet ),
+          _generator( _sheet.generator() ),
+          _column( 0 ),
+          _row( 0 ),
+          _handler( *this )
+    {}
+    
+    void open_()
+    {
+        _sheet.add_row();
+        _row = _sheet.get_rows();
+        _generator.begin_row();
+    }
+    
+    void close_()
+    {
+        _generator.end_row();
+    }
+    
+    void close()
+    {
+        _handler.close();
+    }
+
+    ODSGenerator &generator()
+    {
+        return _generator;
+    }
+    
+    template < class T >
+    CellAddress add_cell( const T& value )
+    {
+        _generator.add_cell( value );
+        
+        ++_column;
+        
+        if( _column > _sheet.get_columns() )
+            _sheet.add_column();
+
+        return CellAddress(_sheet.get_name(),
+                           _column,
+                           _sheet.get_rows());
+    }
+
+    template < class T >
+    Row& operator << ( const T& value )
+    {
+        add_cell( value );
+        return *this;
+    }
+        
+private:
+    Sheet &_sheet;
+    ODSGenerator &_generator;
+
+    unsigned int _column,
+                 _row;
+                 
+    TagHandler< Row > _handler;
+};
 
 class Color
 {

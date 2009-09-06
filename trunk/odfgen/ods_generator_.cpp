@@ -72,6 +72,17 @@ BOOST_PYTHON_MODULE(ods_generator_)
         .def("add_column", &Sheet::add_column)
         .def("add_row", &Sheet::add_row)
     ;
+
+    class_<CellAddress>("CellAddress",
+                        init<const std::string&,
+                             int,
+                             int>())
+    ;
+
+    class_<CellRange>("CellRange",
+                      init<const CellAddress&,
+                           const CellAddress&>())
+    ;
     
     class_<Row>("Row_", init<Sheet&>())
         .def("close", &Row::close)
