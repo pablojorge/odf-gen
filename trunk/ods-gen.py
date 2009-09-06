@@ -12,7 +12,10 @@ def run(command, input=''):
     return (p.returncode, output)
 
 def xsltproc(xslt, arg, input=''):
-    ret, output = run(['xsltproc', xslt, arg], input)
+    ret, output = run(['xsltproc', 
+                        os.path.join(os.path.split(sys.argv[0])[0], xslt), 
+                        arg], 
+                      input)
 
     if ret:
         raise Exception('xsltproc failed (ret:%i)' % (ret))

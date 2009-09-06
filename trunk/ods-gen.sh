@@ -5,4 +5,4 @@ if [ $# -ne 2 ]; then
     exit
 fi
 
-python ods-gen.py $1 $2
+python `dirname $0`/ods-gen.py $1 $2
