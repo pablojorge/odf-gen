@@ -412,9 +412,9 @@ public:
         if( _column > _sheet.get_columns() )
             _sheet.add_column();
 
-        return CellAddress(_sheet.get_name(),
-                           _column,
-                           _sheet.get_rows());
+        return CellAddress( _sheet.get_name(),
+                            _column,
+                            _row );
     }
 
     template < class T >
@@ -471,6 +471,30 @@ std::ostream& operator << ( std::ostream &ostream, const Color& color )
     return ostream;
 }
 
+class ColorGenerator
+{
+public:
+    ColorGenerator()
+        : _idx( 0 )
+    {
+        srandom( time( NULL ) );
+    }
+    
+    Color next()
+    {
+        static unsigned int palette[] = { 0x0000ff, 0xff0000, 0x00ff00,
+                                          0xff00ff, 0xffff00, 0x00ffff };
+        
+        if( _idx < sizeof(palette) / sizeof(palette[0]) )
+            return Color( palette[_idx++] );
+            
+        return Color( random() );
+    }
+
+private:
+    int _idx;
+};
+
 class Series 
 {
 public:
@@ -509,17 +533,20 @@ class Chart
 public:
     Chart( const std::string &name,
            const std::string &width,
-           const std::string &height,
-           const CellRange &range )
+           const std::string &height )
         : _name( name ),
           _width( width ),
-          _height( height ),
-          _range( range )
+          _height( height )
     {}
+
+    void add_range( const CellRange &range )
+    {
+        _range_list.push_back( range );
+    }
 
     void add_series( const Series &series )
     {
-        _list.push_back( series );
+        _series_list.push_back( series );
     }
 
     friend std::ostream& operator << ( std::ostream&, const Chart& );
@@ -528,9 +555,8 @@ private:
     std::string _name,
                 _width,
                 _height;
-    CellRange _range;
-
-    std::list< Series > _list;
+    std::list< CellRange > _range_list;
+    std::list< Series > _series_list;
 };
 
 MAP_ODS_TYPE(Chart, object);
@@ -541,14 +567,24 @@ std::ostream& operator << ( std::ostream &ostream,
     ostream << "<chart name=\"" << chart._name << "\""
             << "       width=\"" << chart._width << "\""
             << "       height=\"" << chart._height << "\""
-            << "       range=\"" << chart._range << "\">";
+            << "       range=\"";
 
-    for( std::list< Series >::const_iterator it = chart._list.begin();
-         it != chart._list.end();
+    for( std::list< CellRange >::const_iterator 
+         it  = chart._range_list.begin();
+         it != chart._range_list.end();
+         it++ )
+        ostream << *it << ";";
+
+    ostream << "\">";
+
+    for( std::list< Series >::const_iterator 
+         it  = chart._series_list.begin();
+         it != chart._series_list.end();
          it++ )
         ostream << *it;
 
     ostream << "</chart>";
+    
     return ostream;
 }
 
@@ -561,13 +597,14 @@ public:
                const Sheet &sheet )
         : Chart( name, 
                  width, 
-                 height, 
-                 CellRange( CellAddress( sheet.get_name(), 1, 1 ),
-                            CellAddress( sheet.get_name(),
-                                         sheet.get_columns(),
-                                         sheet.get_rows() ) ) )
+                 height ) 
     {
-        srandom( time( NULL ) );
+        ColorGenerator generator;
+
+        add_range( CellRange( CellAddress( sheet.get_name(), 1, 1 ),
+                              CellAddress( sheet.get_name(),
+                                           sheet.get_columns(),
+                                           sheet.get_rows() ) ) );
 
         for( unsigned int i = 2; i <= sheet.get_columns(); i++ ) 
         {
@@ -578,7 +615,7 @@ public:
                         values_end( sheet.get_name(), i, sheet.get_rows() );
             CellRange domain( domain_start, domain_end ),
                       values( values_start, values_end );
-            Color color( random() );
+            Color color( generator.next() );
 
             add_series( Series( name, domain, values, color ) );
         }
