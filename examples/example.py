@@ -47,15 +47,15 @@ def test2():
 
     with Spreadsheet( stream ) as spreadsheet:
         with Sheet( spreadsheet, "sheet1" ) as sheet1:
-            sheet1.add_row(["x", "x * 2"])
+            sheet1.append_row(["x", "x * 2"])
 
             for i in range( 5 ):
-                sheet1.add_row([i, i * 2])
+                sheet1.append_row([i, i * 2])
 
-            sheet1.add_row([AutoChart("chart1", 
-                                      "8cm", 
-                                      "8cm", 
-                                      sheet1)])
+            sheet1.append_row([AutoChart("chart1", 
+                                         "8cm", 
+                                         "8cm", 
+                                         sheet1)])
 
     print stream.str()
 

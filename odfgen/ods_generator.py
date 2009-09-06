@@ -56,10 +56,10 @@ class Sheet(Sheet_):
     def __exit__( self, type, value, traceback ):
         self.close()
         
-    def add_row( self, l ):
+    def append_row( self, values ):
         with Row( self ) as row:
-            for v in l:
-                row.add_cell(v)
+            for value in values:
+                row.add_cell( value )
 
 class Row(Row_):
     def __init__( self, sheet ):
