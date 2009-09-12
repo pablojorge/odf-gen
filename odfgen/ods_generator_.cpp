@@ -111,6 +111,10 @@ BOOST_PYTHON_MODULE(ods_generator_)
                                  const std::string&>())
         .def("add_range", &Chart::add_range)
         .def("add_series", &Chart::add_series)
+        .def("set_title", &Chart::set_title)
+        .def("set_subtitle", &Chart::set_subtitle)
+        .def("set_x_axis_label", &Chart::set_x_axis_label)
+        .def("set_y_axis_label", &Chart::set_y_axis_label)
     ;
     
     class_<AutoChart,

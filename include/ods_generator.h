@@ -548,13 +548,37 @@ public:
     {
         _series_list.push_back( series );
     }
+    
+    void set_title( const std::string& title )
+    {
+        _title = title;
+    }
+
+    void set_subtitle( const std::string& subtitle )
+    {
+        _subtitle = subtitle;
+    }
+
+    void set_x_axis_label( const std::string& x_axis_label )
+    {
+        _x_axis_label = x_axis_label;
+    }
+
+    void set_y_axis_label( const std::string& y_axis_label )
+    {
+        _y_axis_label = y_axis_label;
+    }
 
     friend std::ostream& operator << ( std::ostream&, const Chart& );
 
 private:
     std::string _name,
                 _width,
-                _height;
+                _height,
+                _title,
+                _subtitle,
+                _x_axis_label,
+                _y_axis_label;
     std::list< CellRange > _range_list;
     std::list< Series > _series_list;
 };
@@ -567,6 +591,10 @@ std::ostream& operator << ( std::ostream &ostream,
     ostream << "<chart name=\"" << chart._name << "\""
             << "       width=\"" << chart._width << "\""
             << "       height=\"" << chart._height << "\""
+            << "       title=\"" << chart._title << "\""
+            << "       subtitle=\"" << chart._subtitle << "\""
+            << "       x-axis-label=\"" << chart._x_axis_label << "\""
+            << "       y-axis-label=\"" << chart._y_axis_label << "\""
             << "       range=\"";
 
     for( std::list< CellRange >::const_iterator 
