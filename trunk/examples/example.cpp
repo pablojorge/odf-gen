@@ -59,10 +59,10 @@ void test2()
     for( int x = -10; x <= 10; x++ )
         Row( sheet1 ) << x << x * x << x * 2 << x * -5;
 
-    Row( sheet1 ) << AutoChart( "chart1",   // name
-                                "14cm",     // width
-                                "10cm",     // height
-                                sheet1 );   // sheet to extract series from
+    Row( sheet1 ) << AutoChart( "chart1",        // name
+                                Centimeters(14), // width
+                                Centimeters(10), // height
+                                sheet1 );        // sheet to extract series from
 }
 
 int main( int argc, char const* argv[] )

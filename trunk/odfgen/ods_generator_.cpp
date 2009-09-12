@@ -100,15 +100,23 @@ BOOST_PYTHON_MODULE(ods_generator_)
         .def("next", &ColorGenerator::next)
     ;
     
+    class_<Length>("Length_", no_init)
+       .def("str", &Length::str)
+    ;
+
+    class_<Centimeters,
+           bases<Length> >("Centimeters_", init<unsigned int>())
+    ;
+    
     class_<Series>("Series_", init<const CellAddress&,
                                    const CellRange&,
                                    const CellRange&,
                                    const Color&>())
     ;
-    
+
     class_<Chart>("Chart_", init<const std::string&,
-                                 const std::string&,
-                                 const std::string&>())
+                                 const Length&,
+                                 const Length&>())
         .def("add_range", &Chart::add_range)
         .def("add_series", &Chart::add_series)
         .def("set_title", &Chart::set_title)
@@ -119,8 +127,8 @@ BOOST_PYTHON_MODULE(ods_generator_)
     
     class_<AutoChart,
            bases<Chart> >("AutoChart_", init<const std::string&,
-                                             const std::string&,
-                                             const std::string&,
+                                             const Length&,
+                                             const Length&,
                                              const Sheet&>())
     ;
 }
