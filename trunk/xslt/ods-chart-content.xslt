@@ -71,8 +71,20 @@
       <number:number number:min-integer-digits="1"/>
     </number:number-style>
     <style:style style:name="chart-style" 
-                  style:family="chart">
+                 style:family="chart">
       <style:graphic-properties draw:stroke="none"/>
+    </style:style>
+    <style:style style:name="chart-title-style" 
+                 style:family="chart">
+      <style:text-properties fo:font-size="13pt" 
+                             style:font-size-asian="13pt" 
+                             style:font-size-complex="13pt"/>
+    </style:style>
+    <style:style style:name="chart-subtitle-style" 
+                 style:family="chart">
+      <style:text-properties fo:font-size="11pt" 
+                             style:font-size-asian="11pt" 
+                             style:font-size-complex="11pt"/>
     </style:style>
     <style:style style:name="legend-style" 
                  style:family="chart">
@@ -102,6 +114,12 @@
       <style:text-properties fo:font-size="8pt" 
                              style:font-size-asian="8pt" 
                              style:font-size-complex="8pt"/>
+    </style:style>
+    <style:style style:name="axis-title-style" 
+                 style:family="chart">
+      <style:text-properties fo:font-size="9pt" 
+                             style:font-size-asian="9pt" 
+                             style:font-size-complex="9pt"/>
     </style:style>
     <style:style style:name="grid-style" 
                  style:family="chart">
@@ -146,6 +164,16 @@
                svg:height="{@height}" 
                chart:class="chart:scatter"
                chart:style-name="chart-style">
+    <xsl:if test="not(string-length(@title)=0)">
+      <chart:title chart:style-name="chart-title-style">
+        <text:p><xsl:value-of select="@title"/></text:p>
+      </chart:title>
+    </xsl:if>
+    <xsl:if test="not(string-length(@subtitle)=0)">
+      <chart:subtitle chart:style-name="chart-subtitle-style">
+        <text:p><xsl:value-of select="@subtitle"/></text:p>
+      </chart:subtitle>
+    </xsl:if>
     <chart:legend chart:legend-position="end" 
                   chart:style-name="legend-style"/>
     <chart:plot-area chart:style-name="plot-area-style" 
@@ -153,12 +181,19 @@
                      chart:data-source-has-labels="row">
       <chart:axis chart:dimension="x" 
                   chart:name="primary-x"
-                  chart:style-name="axis-style"/>
+                  chart:style-name="axis-style">
+        <chart:title chart:style-name="axis-title-style">
+          <text:p><xsl:value-of select="@x-axis-label"/></text:p>
+        </chart:title>
+      </chart:axis>
       <chart:axis chart:dimension="y" 
                   chart:name="primary-y"
                   chart:style-name="axis-style">
         <chart:grid chart:style-name="grid-style" 
                     chart:class="major"/>
+        <chart:title chart:style-name="axis-title-style">
+          <text:p><xsl:value-of select="@y-axis-label"/></text:p>
+        </chart:title>
       </chart:axis>
       <xsl:apply-templates select="series"/>
       <chart:wall chart:style-name="wall-style"/>
