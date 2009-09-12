@@ -53,8 +53,8 @@ def test2():
                 sheet1.append_row([i, i * 2])
 
             sheet1.append_row([AutoChart("chart1", 
-                                         "8cm", 
-                                         "8cm", 
+                                         Centimeters(8), 
+                                         Centimeters(8), 
                                          sheet1)])
 
     print stream.str()

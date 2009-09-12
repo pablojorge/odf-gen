@@ -80,6 +80,13 @@ class Color(Color_):
 class ColorGenerator(ColorGenerator_):
     pass
 
+class Length(Length_):
+    def __str__(self):
+        return self.str()
+
+class Centimeters(Centimeters_):
+    pass
+        
 class Series(Series_):
     pass
 

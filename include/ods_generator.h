@@ -495,6 +495,42 @@ private:
     int _idx;
 };
 
+class Length
+{
+public:
+    Length( unsigned int value )
+        : _value( value )
+    {}
+    
+    virtual const char* unit() const
+    {
+        return "";
+    }
+    
+    std::string str() const
+    {
+        std::stringstream stream;
+        stream << _value << this->unit();
+        return stream.str();
+    }
+
+private:
+    unsigned int _value;
+};
+
+class Centimeters : public Length
+{
+public:
+    Centimeters( unsigned int value )
+        : Length( value )
+    {}
+    
+    const char* unit() const
+    {
+        return "cm";
+    }
+};
+
 class Series 
 {
 public:
@@ -532,11 +568,11 @@ class Chart
 {
 public:
     Chart( const std::string &name,
-           const std::string &width,
-           const std::string &height )
+           const Length &width,
+           const Length &height )
         : _name( name ),
-          _width( width ),
-          _height( height )
+          _width( width.str() ),
+          _height( height.str() )
     {}
 
     void add_range( const CellRange &range )
@@ -620,8 +656,8 @@ class AutoChart : public Chart
 {
 public:
     AutoChart( const std::string &name,
-               const std::string &width,
-               const std::string &height,
+               const Length &width,
+               const Length &height,
                const Sheet &sheet )
         : Chart( name, 
                  width, 
