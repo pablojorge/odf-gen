@@ -1,14 +1,13 @@
 include Config.mk
 
-ALL = examples odfgen
+ALL = odfgen
 
 all: $(ALL)
 
 $(ALL):
 	$(MAKE) -C $@
-	echo $(PY_LIB_PREFIX)
 
-install:
+install: all
 	mkdir -p $(INC_PREFIX)/$(INC_DIR)
 	cp -av include/* $(INC_PREFIX)/$(INC_DIR)
 	cp -rav odfgen $(PY_LIB_PREFIX)

@@ -8,10 +8,9 @@ all: $(ALL)
 
 test: example
 	./example > test.xml
-	xmllint --format test.xml
-	cd ..; ./ods-gen.sh examples/test.xml examples/test.ods; cd -
+	odsgen test.xml test.ods
 
-example: example.cpp ../include/ods_generator.h
+example: example.cpp ../include/odsgenerator.h
 
 %: %.cpp
 	$(CXX) $(CFLAGS) $< -o $@

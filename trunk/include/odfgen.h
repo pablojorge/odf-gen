@@ -1,5 +1,5 @@
 /*
-odf_gen: Simple API to generate OpenDocumen documents.
+odf-gen: Simple API to generate OpenDocument documents.
     Copyright (C) 2009  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
@@ -18,20 +18,20 @@ odf_gen: Simple API to generate OpenDocumen documents.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ODF_GEN_H
-#define ODF_GEN_H
+#ifndef ODFGEN_H
+#define ODFGEN_H
 
-#ifdef ODF_GEN_NAMESPACE
-namespace odf_gen
+#ifdef ODFGEN_NAMESPACE
+namespace odfgen
 {
 #endif
 
-#ifndef NO_ODS_GENERATOR
-#   include <ods_generator.h>
+#ifndef NO_ODSGENERATOR
+#   include <odsgenerator.h>
 #endif
 
-#ifdef ODF_GEN_NAMESPACE
+#ifdef ODFGEN_NAMESPACE
 }
 #endif
 
-#endif // ODS_GENERATOR_H
+#endif // ODFGEN_H

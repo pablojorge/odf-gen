@@ -1,5 +1,5 @@
 /*
-ods_generator: Simple API to generate a ods-like xml file.
+odf-gen: Simple API to generate OpenDocument documents.
     Copyright (C) 2009  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
@@ -20,7 +20,7 @@ ods_generator: Simple API to generate a ods-like xml file.
 
 #include <iostream>
 
-#include <odf_gen/odf_gen.h>
+#include <odfgen/odfgen.h>
 
 // using ODSGenerator directly
 void test1() 

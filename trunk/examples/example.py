@@ -1,4 +1,4 @@
-# ods_generator: Simple API to generate a ods-like xml file.
+# odf-gen: Simple API to generate OpenDocument documents.
 # Copyright (C) 2009  Pablo Jorge, FuDePAN
 #
 # This file is part of the odf-gen project.
@@ -18,7 +18,7 @@
 
 import sys
 
-from odfgen.ods_generator import *
+from odfgen.odsgenerator import *
 
 # using ODSGenerator directly
 def test1():

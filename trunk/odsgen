@@ -5,4 +5,4 @@ if [ $# -ne 2 ]; then
     exit
 fi
 
-python "/usr/local/lib/odf_gen/ods-gen.py" $1 $2
+python "/usr/local/lib/odfgen/odsgen.py" $1 $2
