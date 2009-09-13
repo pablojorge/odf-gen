@@ -1,4 +1,4 @@
-# ods_generator: Simple API to generate a ods-like xml file.
+# odf-gen: Simple API to generate OpenDocument documents.
 # Copyright (C) 2009  Pablo Jorge, FuDePAN
 #
 # This file is part of the odf-gen project.
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 
-from ods_generator_ import *
+from odsgenerator_ import *
 
 class ODSGenerator(ODSGenerator_):
     @staticmethod

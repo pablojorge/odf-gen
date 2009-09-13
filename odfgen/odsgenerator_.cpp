@@ -1,5 +1,5 @@
 /*
-ods_generator: Simple API to generate a ods-like xml file.
+odf-gen: Simple API to generate OpenDocument documents.
     Copyright (C) 2009  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
@@ -20,11 +20,11 @@ ods_generator: Simple API to generate a ods-like xml file.
 
 #include <sstream>
 #include <boost/python.hpp>
-#include "include/ods_generator.h"
+#include "include/odsgenerator.h"
 
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE(ods_generator_)
+BOOST_PYTHON_MODULE(odsgenerator_)
 {
     class_<OutputStream>("OutputStream")
     ;

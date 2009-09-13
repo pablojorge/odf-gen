@@ -1,8 +1,8 @@
 INC_PREFIX=/usr/local/include
-INC_DIR=odf_gen
+INC_DIR=odfgen
 
 LIB_PREFIX=/usr/local/lib
-LIB_DIR=odf_gen
+LIB_DIR=odfgen
 
 BIN_PREFIX=/usr/local/bin
 

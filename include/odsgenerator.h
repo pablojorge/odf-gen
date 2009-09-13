@@ -1,5 +1,5 @@
 /*
-ods_generator: Simple API to generate a ods-like xml file.
+odf-gen: Simple API to generate OpenDocument documents.
     Copyright (C) 2009  Pablo Jorge, FuDePAN
 
     This file is part of the odf-gen project.
@@ -18,8 +18,8 @@ ods_generator: Simple API to generate a ods-like xml file.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ODS_GENERATOR_H
-#define ODS_GENERATOR_H
+#ifndef ODSGENERATOR_H
+#define ODSGENERATOR_H
 
 #include <iostream>
 #include <fstream>
@@ -688,4 +688,4 @@ public:
 
 MAP_ODS_TYPE(AutoChart, object);
 
-#endif // ODS_GENERATOR_H
+#endif // ODSGENERATOR_H

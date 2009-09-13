@@ -1,11 +1,11 @@
-ALL = ods_generator_.so
+ALL = odsgenerator_.so
 
 CFLAGS += -I /usr/include/python2.6/ -I ..
 LFLAGS += -lboost_python
 
 all: $(ALL)
 
-ods_generator_.o: ods_generator_.cpp ../include/ods_generator.h
+odsgenerator_.o: odsgenerator_.cpp ../include/odsgenerator.h
 
 %.o: %.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
@@ -14,5 +14,5 @@ ods_generator_.o: ods_generator_.cpp ../include/ods_generator.h
 	$(CXX) $(LFLAGS) -shared -o $@ -fpic -fPIC $< 
 
 clean:
-	rm -rf $(ALL) *.o
+	rm -rf $(ALL) *.o *.pyc
 
