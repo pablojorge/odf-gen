@@ -1,6 +1,7 @@
 include Config.mk
 
-TARGET = odfgen
+PY_MODULES = python-modules
+TARGET = $(PY_MODULES)
 
 all: $(TARGET)
 
@@ -14,9 +15,9 @@ install-headers:
 uninstall-headers:
 	rm -rf $(INC_PREFIX)/$(INC_DIR)
 
-install-python-modules: odfgen
+install-python-modules: $(PY_MODULES)
 	mkdir -p $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
-	cp -av odfgen/*.py odfgen/*.so $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
+	cp -av $(PY_MODULES)/*.py $(PY_MODULES)/*.so $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
 
 uninstall-python-modules:
 	rm -rf $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
