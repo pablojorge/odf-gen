@@ -24,7 +24,7 @@ odf-gen: Simple API to generate OpenDocument documents.
 
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE(odsgenerator_)
+BOOST_PYTHON_MODULE(_odsgenerator)
 {
     class_<OutputStream>("OutputStream")
     ;
@@ -42,11 +42,12 @@ BOOST_PYTHON_MODULE(odsgenerator_)
 
     class_<File,
            bases<OutputStream>,
-           boost::noncopyable>("File", init<const std::string&>())
+           boost::noncopyable>("File", 
+                               init<const std::string&>())
         .def("close", &File::close) 
     ;
 
-    class_<ODSGenerator>("ODSGenerator_", 
+    class_<ODSGenerator>("ODSGenerator", 
                          init<OutputStream&>())
         .def("begin_spreadsheet", &ODSGenerator::begin_spreadsheet)
         .def("end_spreadsheet", &ODSGenerator::end_spreadsheet)
@@ -59,12 +60,14 @@ BOOST_PYTHON_MODULE(odsgenerator_)
         .def("add_chart", &ODSGenerator::add_cell<const Chart&>)
     ;
     
-    class_<Spreadsheet>("Spreadsheet_",
+    class_<Spreadsheet>("Spreadsheet",
                         init<OutputStream&>())
         .def("close", &Spreadsheet::close)
     ;
     
-    class_<Sheet>("Sheet_", init<Spreadsheet&, const std::string&>())
+    class_<Sheet>("Sheet", 
+                  init<Spreadsheet&, 
+                       const std::string&>())
         .def("close", &Sheet::close)
         .def("get_name", &Sheet::get_name)
         .def("get_columns", &Sheet::get_columns)
@@ -84,39 +87,45 @@ BOOST_PYTHON_MODULE(odsgenerator_)
                            const CellAddress&>())
     ;
     
-    class_<Row>("Row_", init<Sheet&>())
+    class_<Row>("Row", 
+                init<Sheet&>())
         .def("close", &Row::close)
         .def("add_string", &Row::add_cell<const std::string&>)
         .def("add_number", &Row::add_cell<double>)
         .def("add_chart", &Row::add_cell<const Chart&>)
     ;
     
-    class_<Color>("Color_", init<unsigned char,
-                                 unsigned char,
-                                 unsigned char>())
+    class_<Color>("Color", 
+                  init<unsigned char,
+                       unsigned char,
+                       unsigned char>())
     ;
     
-    class_<ColorGenerator>("ColorGenerator_")
+    class_<ColorGenerator>("ColorGenerator")
         .def("next", &ColorGenerator::next)
     ;
     
-    class_<Length>("Length_", no_init)
+    class_<Length>("Length", 
+                   no_init)
        .def("str", &Length::str)
     ;
 
     class_<Centimeters,
-           bases<Length> >("Centimeters_", init<unsigned int>())
+           bases<Length> >("Centimeters", 
+                           init<unsigned int>())
     ;
     
-    class_<Series>("Series_", init<const CellAddress&,
-                                   const CellRange&,
-                                   const CellRange&,
-                                   const Color&>())
+    class_<Series>("Series", 
+                   init<const CellAddress&,
+                        const CellRange&,
+                        const CellRange&,
+                        const Color&>())
     ;
 
-    class_<Chart>("Chart_", init<const std::string&,
-                                 const Length&,
-                                 const Length&>())
+    class_<Chart>("Chart", 
+                  init<const std::string&,
+                       const Length&,
+                       const Length&>())
         .def("add_range", &Chart::add_range)
         .def("add_series", &Chart::add_series)
         .def("set_title", &Chart::set_title)
@@ -126,9 +135,10 @@ BOOST_PYTHON_MODULE(odsgenerator_)
     ;
     
     class_<AutoChart,
-           bases<Chart> >("AutoChart_", init<const std::string&,
-                                             const Length&,
-                                             const Length&,
-                                             const Sheet&>())
+           bases<Chart> >("AutoChart", 
+                          init<const std::string&,
+                               const Length&,
+                               const Length&,
+                               const Sheet&>())
     ;
 }
