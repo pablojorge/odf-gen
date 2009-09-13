@@ -20,7 +20,7 @@ ods_generator: Simple API to generate a ods-like xml file.
 
 #include <iostream>
 
-#include "include/ods_generator.h"
+#include <odf_gen/odf_gen.h>
 
 // using ODSGenerator directly
 void test1() 

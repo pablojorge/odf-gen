@@ -55,10 +55,10 @@ if __name__ == '__main__':
     input, output = sys.argv[1:]
 
     print "Generating main XML file..."
-    content = xsltproc('xslt/ods-main-content.xslt', input)
+    content = xsltproc('ods-main-content.xslt', input)
 
     print "Extracting charts..."
-    charts = xsltproc('xslt/ods-extract-charts.xslt', input)
+    charts = xsltproc('ods-extract-charts.xslt', input)
     charts = charts.split('__SEP__')
 
     print "Generating objects..."
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     for chart in charts:
         if chart and chart != '\n':
             object = (chart_name(chart),
-                      xsltproc('xslt/ods-chart-content.xslt', '-', chart))
+                      xsltproc('ods-chart-content.xslt', '-', chart))
             objects.append(object)
 
     print "Creating '%s'..." % (output)
