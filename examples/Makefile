@@ -16,4 +16,4 @@ example: example.cpp ../include/odsgenerator.h
 	$(CXX) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf $(ALL)
+	rm -rf $(ALL) test.*
