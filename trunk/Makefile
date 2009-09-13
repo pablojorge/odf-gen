@@ -15,10 +15,11 @@ uninstall-headers:
 	rm -rf $(INC_PREFIX)/$(INC_DIR)
 
 install-python-modules: odfgen
-	cp -av odfgen/*.py odfgen/*.so $(PY_LIB_PREFIX)
+	mkdir -p $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
+	cp -av odfgen/*.py odfgen/*.so $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
 
 uninstall-python-modules:
-	rm -rf $(PY_LIB_PREFIX)/odfgen
+	rm -rf $(PY_LIB_PREFIX)/$(PY_LIB_DIR)
 
 install-bin:
 	mkdir -p $(LIB_PREFIX)/$(LIB_DIR)
