@@ -16,83 +16,56 @@
 # You should have received a copy of the GNU General Public License
 # along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 
-from odsgenerator_ import *
+from _odsgenerator import *
 
-class ODSGenerator(ODSGenerator_):
-    @staticmethod
-    def type_map( value ):
-        type_mapping = [
-            ([int, float], "add_number"),
-            ([str], "add_string"),
-            ([Chart, AutoChart], "add_chart")
-        ]
+# type mapper (python style)
+def type_map( value ):
+    type_mapping = [
+        ([int, float], "number"),
+        ([str], "string"),
+        ([Chart, AutoChart], "chart")
+    ]
 
-        method = reduce(lambda o, p: p[1] if type(value) in p[0] else o, 
-                        type_mapping, 
-                        None)
+    typestr = reduce(lambda o, p: p[1] if type(value) in p[0] else o, 
+                     type_mapping, 
+                     None)
 
-        if not method:
-            raise Exception("Unable to map type '%s'" % (type(value)))
+    if not typestr:
+        raise Exception("Unable to map type '%s'" % (type(value)))
 
-        return method
-    
-    def add_cell( self, value ):
-        getattr(self, ODSGenerator.type_map(value))(value)
+    return typestr
 
-class Spreadsheet(Spreadsheet_):
-    def __enter__( self ):
-        return self
-    
-    def __exit__( self, type, value, traceback ):
-        self.close()
+## methods to be injected (duck punching)
+# automatic scope handling:
+def scope_enter( self ):
+    return self
 
-class Sheet(Sheet_):
-    def __init__( self, spreadsheet, name ):
-        Sheet_.__init__( self, spreadsheet, name )
-
-    def __enter__( self ):
-        return self
-    
-    def __exit__( self, type, value, traceback ):
-        self.close()
+def scope_exit( self, type, value, traceback ):
+    self.close()
         
-    def append_row( self, values ):
-        with Row( self ) as row:
-            for value in values:
-                row.add_cell( value )
+# automatic type handling:
+def add_cell( self, value ):
+    method = "add_" + type_map(value)
+    return getattr(self, method)(value)
 
-class Row(Row_):
-    def __init__( self, sheet ):
-        Row_.__init__( self, sheet )
+def append_row( self, values ):
+    with Row( self ) as row:
+        for value in values:
+            row.add_cell( value )
 
-    def __enter__( self ):
-        return self
-    
-    def __exit__( self, type, value, traceback ):
-        self.close()
+# ODSGenerator patching:
+ODSGenerator.add_cell = add_cell
 
-    def add_cell( self, value ):
-        return getattr(self, ODSGenerator.type_map(value))(value)
+# Spreadsheet patching:
+Spreadsheet.__enter__ = scope_enter
+Spreadsheet.__exit__ = scope_exit
 
-class Color(Color_):
-    pass
+# Sheet patching:
+Sheet.__enter__ = scope_enter
+Sheet.__exit__ = scope_exit
+Sheet.append_row = append_row
 
-class ColorGenerator(ColorGenerator_):
-    pass
-
-class Length(Length_):
-    def __str__(self):
-        return self.str()
-
-class Centimeters(Centimeters_):
-    pass
-        
-class Series(Series_):
-    pass
-
-class Chart(Chart_):
-    pass
-
-class AutoChart(AutoChart_):
-    pass
-
+# Row patching:
+Row.__enter__ = scope_enter
+Row.__exit__ = scope_exit
+Row.add_cell = add_cell
