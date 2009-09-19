@@ -26,29 +26,27 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(_odsgenerator)
 {
-    class_<OutputStream>("OutputStream")
+    class_<std::ostream,
+           boost::noncopyable>("OutputStream",
+                               no_init)
     ;
 
-    class_<StdOut,
-           bases<OutputStream>,
-           boost::noncopyable>("StdOut")
-    ;
-
-    class_<StringStream,
-           bases<OutputStream>,
+    class_<std::stringstream,
+           bases<std::ostream>,
            boost::noncopyable>("StringStream")
-        .def("str", &StringStream::str)
+        .def("str", (std::string (std::stringstream::*)() const)
+                    (&std::stringstream::str))
     ;
 
-    class_<File,
-           bases<OutputStream>,
+    class_<std::ofstream,
+           bases<std::ostream>,
            boost::noncopyable>("File", 
-                               init<const std::string&>())
-        .def("close", &File::close) 
+                               init<const char*>())
+        .def("close", &std::ofstream::close) 
     ;
 
     class_<ODSGenerator>("ODSGenerator", 
-                         init<OutputStream&>())
+                         init<std::ostream&>())
         .def("begin_spreadsheet", &ODSGenerator::begin_spreadsheet)
         .def("end_spreadsheet", &ODSGenerator::end_spreadsheet)
         .def("begin_sheet", &ODSGenerator::begin_sheet)
@@ -61,7 +59,7 @@ BOOST_PYTHON_MODULE(_odsgenerator)
     ;
     
     class_<Spreadsheet>("Spreadsheet",
-                        init<OutputStream&>())
+                        init<std::ostream&>())
         .def("close", &Spreadsheet::close)
     ;
     
