@@ -5,6 +5,10 @@ TARGET = $(PY_MODULES)
 
 all: $(TARGET)
 
+clean:
+	$(MAKE) $@ -C $(PY_MODULES)
+	$(MAKE) $@ -C examples
+
 $(TARGET):
 	$(MAKE) -C $@
 
@@ -33,5 +37,8 @@ uninstall-bin:
 
 install: install-headers install-python-modules install-bin
 uninstall: uninstall-headers uninstall-python-modules uninstall-bin
+
+install-cpp: install-headers install-bin
+install-python: install-python-modules install-bin
 
 .PHONY: $(TARGET)
