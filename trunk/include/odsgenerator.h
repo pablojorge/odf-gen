@@ -28,6 +28,9 @@ odf-gen: Simple API to generate OpenDocument documents.
 #include <list>
 #include <cstdlib>
 
+#define MILI_NAMESPACE
+#include <mili/mili.h>
+
 template <class T>
 struct ODSType
 {
@@ -99,6 +102,14 @@ public:
         _ostream << "<cell type=\"" << ODSType< T >::convert() << "\">";
     }
 
+    template < class S,
+               class T >
+    void begin_cell( const S& style )
+    {
+        _ostream << "<cell style=\"" << style << "\"" 
+                 << "      type=\"" << ODSType< T >::convert() << "\">";
+    }
+
     void end_cell() 
     {
         _ostream << "</cell>";
@@ -114,6 +125,16 @@ public:
     void add_cell( const T& value )
     {
         begin_cell< T >();
+        add_value( value );
+        end_cell();
+    }
+        
+    template < class S,
+               class T >
+    void add_cell( const S& style,
+                   const T& value )
+    {
+        begin_cell< S, T >( style );
         add_value( value );
         end_cell();
     }
@@ -305,6 +326,53 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
+class Style
+{
+public:
+    typedef enum {
+        NONE          = 0x0000,
+        BORDER_BOTTOM = 0x0001,
+        BORDER_LEFT   = 0x0002,
+        BORDER_RIGHT  = 0x0004,
+        BORDER_TOP    = 0x0008
+    } StyleFlags ;
+
+    Style( StyleFlags flags = NONE ) 
+        : _flags( flags )
+    {}
+
+    Style& operator = ( StyleFlags flags )
+    {
+        _flags = flags;
+        return *this;
+    }
+
+    Style& operator |= ( const Style& other  )
+    {
+        _flags |= other._flags;
+        return *this;
+    }
+
+    friend std::ostream& operator << ( std::ostream&, const Style& );
+
+private:
+    mili::bitwise_enum< StyleFlags > _flags;
+};
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const Style& style ) 
+{
+    if( (style._flags & style.BORDER_BOTTOM).has_bits() )
+        ostream << "border-bottom,";
+    if( (style._flags & style.BORDER_LEFT).has_bits() )
+        ostream << "border-left,";
+    if( (style._flags & style.BORDER_RIGHT).has_bits() )
+        ostream << "border-right,";
+    if( (style._flags & style.BORDER_TOP).has_bits() )
+        ostream << "border-top,";
+    return ostream;
+}
+
 class Row 
 {
 public:
@@ -341,16 +409,30 @@ public:
     template < class T >
     CellAddress add_cell( const T& value )
     {
-        _generator.add_cell( value );
+        // add the cell using the preset style
+        _generator.add_cell( _style, value );
+
+        // reset style
+        _style = Style::NONE;
         
+        // increment current column count
         ++_column;
         
+        // if current column count > maximum column count
+        // for all the rows in this sheet, update sheet's
+        // column count
         if( _column > _sheet.get_columns() )
             _sheet.add_column();
 
+        // return a valid CellAddress
         return CellAddress( _sheet.get_name(),
                             _column,
                             _row );
+    }
+
+    void add_style( const Style& style )
+    {
+        _style |= style;
     }
 
     template < class T >
@@ -359,16 +441,25 @@ public:
         add_cell( value );
         return *this;
     }
+
+    Row& operator << ( const Style& style )
+    {
+        add_style( style );
+        return *this;
+    }
         
 private:
     Sheet &_sheet;
     ODSGenerator &_generator;
 
+    Style _style;
     unsigned int _column,
                  _row;
-                 
+
     TagHandler< Row > _handler;
 };
+
+inline Style separator() { return Style( Style::BORDER_LEFT ); }
 
 class Color
 {

@@ -32,6 +32,9 @@
   xmlns:field="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:field:1.0" 
   xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" 
   xmlns="http://www.w3.org/1999/xhtml">
+<!-- See "Extracting Unique Values with XSL" 
+     (http://www.bernzilla.com/item.php?id=333) -->
+<xsl:key name="cell-styles" match="cell" use="@style"/>
 <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 <xsl:template match="/spreadsheet">
 <office:document-content 
@@ -65,6 +68,63 @@
   xmlns:field="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:field:1.0" 
   xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" 
   office:version="1.2">
+<office:automatic-styles>
+  <xsl:for-each select="//cell[generate-id() = generate-id(key('cell-styles',@style)[1])]">
+    <style:style style:name="cell-style-{@style}" 
+                 style:family="table-cell">
+      <style:table-cell-properties>
+        <xsl:choose>
+          <xsl:when test="contains(@style,'border-bottom')">
+            <xsl:attribute name="fo:border-bottom">
+              <xsl:text>0.0008in solid #000000</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-bottom">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="contains(@style,'border-left')">
+            <xsl:attribute name="fo:border-left">
+              <xsl:text>0.0008in solid #000000</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-left">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="contains(@style,'border-right')">
+            <xsl:attribute name="fo:border-right">
+              <xsl:text>0.0008in solid #000000</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-right">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="contains(@style,'border-top')">
+            <xsl:attribute name="fo:border-top">
+              <xsl:text>0.0008in solid #000000</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-top">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </style:table-cell-properties>
+    </style:style>
+  </xsl:for-each>
+</office:automatic-styles>
 <office:body>
 <office:spreadsheet>
 <xsl:apply-templates select="sheet"/>
@@ -89,7 +149,9 @@
         </table:table-cell>
       </xsl:when>
       <xsl:otherwise>
-        <table:table-cell office:value-type="{@type}" office:value="{.}">
+        <table:table-cell table:style-name="cell-style-{@style}"
+                          office:value-type="{@type}" 
+                          office:value="{.}">
           <text:p>
             <xsl:value-of select="."/>
           </text:p>
