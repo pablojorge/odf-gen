@@ -57,6 +57,11 @@ struct ODSType<char[N]>
     static const char* convert() { return "string"; }
 };
 
+class Style;
+
+std::ostream& operator << ( std::ostream &ostream,
+                            const Style& style );
+
 class ODSGenerator 
 {
 public:
@@ -97,17 +102,24 @@ public:
     }
 
     template < class T >
-    void begin_cell()
-    {
-        _ostream << "<cell type=\"" << ODSType< T >::convert() << "\">";
-    }
-
-    template < class S,
-               class T >
-    void begin_cell( const S& style )
+    void begin_cell( const Style& style,
+                     unsigned int column_span )
     {
         _ostream << "<cell style=\"" << style << "\"" 
+                 << "      column-span=\"" << column_span << "\""
                  << "      type=\"" << ODSType< T >::convert() << "\">";
+    }
+
+    template < class T >
+    void begin_cell( const Style& style )
+    {
+        begin_cell< T >( style, 0 );
+    }
+
+    template < class T >
+    void begin_cell()
+    {
+        begin_cell< T >( Style(), 0 );
     }
 
     void end_cell() 
@@ -122,21 +134,26 @@ public:
     }
 
     template < class T >
-    void add_cell( const T& value )
+    void add_cell( const T& value,
+                   const Style& style,
+                   unsigned int column_span )
     {
-        begin_cell< T >();
+        begin_cell< T >( style, column_span );
         add_value( value );
         end_cell();
     }
-        
-    template < class S,
-               class T >
-    void add_cell( const S& style,
-                   const T& value )
+
+    template < class T >
+    void add_cell( const T& value,
+                   const Style& style )
     {
-        begin_cell< S, T >( style );
-        add_value( value );
-        end_cell();
+        add_cell( value, style, 0 );
+    }
+        
+    template < class T >
+    void add_cell( const T& value )
+    {
+        add_cell( value, Style(), 0 );
     }
         
 private:
@@ -373,6 +390,29 @@ std::ostream& operator << ( std::ostream &ostream,
     return ostream;
 }
 
+template < class T >
+class ColumnSpan
+{
+public:
+    ColumnSpan( const T& value, unsigned int count )
+        : _value( value ),
+          _count( count )
+    {}
+
+    const T& value() const { return _value; }
+    unsigned int count() const { return _count; }
+    
+private:
+    T _value;
+    unsigned int _count;
+};
+
+template < class T >
+inline ColumnSpan< T > column_span( T value, unsigned int count )
+{
+    return ColumnSpan< T >( value, count );
+}
+
 class Row 
 {
 public:
@@ -407,16 +447,25 @@ public:
     }
     
     template < class T >
-    CellAddress add_cell( const T& value )
+    CellAddress add_cell( const T& value,
+                          unsigned int column_span )
     {
         // add the cell using the preset style
-        _generator.add_cell( _style, value );
+        _generator.add_cell( value, _style, column_span );
 
         // reset style
         _style = Style::NONE;
         
         // increment current column count
         ++_column;
+        
+        // capture current cell address
+        CellAddress address( _sheet.get_name(),
+                             _column,
+                             _row );
+
+        // adjust (if necessary) the columns count
+        _column += column_span ? column_span - 1 : 0;
         
         // if current column count > maximum column count
         // for all the rows in this sheet, update sheet's
@@ -425,9 +474,13 @@ public:
             _sheet.add_column();
 
         // return a valid CellAddress
-        return CellAddress( _sheet.get_name(),
-                            _column,
-                            _row );
+        return address;
+    }
+
+    template < class T >
+    CellAddress add_cell( const T& value )
+    {
+        return add_cell( value, 0 );
     }
 
     void add_style( const Style& style )
@@ -448,6 +501,14 @@ public:
         return *this;
     }
         
+    template < class T >
+    Row& operator << ( const ColumnSpan< T >& spanned_value )
+    {
+        add_cell( spanned_value.value(),
+                  spanned_value.count() );
+        return *this;
+    }
+
 private:
     Sheet &_sheet;
     ODSGenerator &_generator;

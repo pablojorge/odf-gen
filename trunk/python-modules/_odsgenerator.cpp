@@ -92,14 +92,17 @@ BOOST_PYTHON_MODULE(_odsgenerator)
     class_<Style>("Style")
     ;
 
-    def("separator", separator);
+    def("separator", &separator);
     
     class_<Row>("Row", 
                 init<Sheet&>())
         .def("close", &Row::close)
-        .def("add_string", &Row::add_cell<const std::string&>)
-        .def("add_number", &Row::add_cell<double>)
-        .def("add_chart", &Row::add_cell<const Chart&>)
+        .def("add_string", (CellAddress (Row::*)(const std::string&))
+                           (&Row::add_cell<const std::string&>))
+        .def("add_number", (CellAddress (Row::*)(const double&))
+                           (&Row::add_cell<const double&>))
+        .def("add_chart", (CellAddress (Row::*)(const Chart&))
+                          (&Row::add_cell<const Chart&>))
         .def("add_style", &Row::add_style)
     ;
     
