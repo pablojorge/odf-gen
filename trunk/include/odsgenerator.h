@@ -30,7 +30,9 @@ odf-gen: Simple API to generate OpenDocument documents.
 
 template <class T>
 struct ODSType
-{};
+{
+    static const char* convert() { return "float"; }
+};
 
 template <class T>
 struct ODSType<const T&> : public ODSType<T>
@@ -42,10 +44,6 @@ struct ODSType<cpptype> \
 { \
     static const char* convert() { return #odstype; } \
 };
-
-MAP_ODS_TYPE(double, float);
-MAP_ODS_TYPE(float, float);
-MAP_ODS_TYPE(int, float);
 
 MAP_ODS_TYPE(const char*, string);
 MAP_ODS_TYPE(std::string, string);
