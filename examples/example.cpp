@@ -53,10 +53,12 @@ void test2()
     Spreadsheet spreadsheet;
 
     Sheet sheet1( spreadsheet, "sheet1" );
+
+    Row( sheet1 ) << column_span( "functions", 4 );
     
     Style border_bottom( Style::BORDER_BOTTOM );
 
-    Row( sheet1 ) << border_bottom << "x" << separator()
+    Row( sheet1 ) << border_bottom << "x"
                   << border_bottom << "f(x) = x ^ 2" 
                   << border_bottom << "f(x) = 2x" 
                   << border_bottom << "f(x) = -5x";

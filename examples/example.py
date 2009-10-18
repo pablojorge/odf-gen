@@ -22,7 +22,9 @@ from odfgen.odsgenerator import *
 
 # using ODSGenerator directly
 def test1():
-    output = ODSGenerator()
+    stream = StringStream()
+
+    output = ODSGenerator(stream)
  
     output.begin_spreadsheet();
     output.begin_sheet( "test" );
@@ -40,6 +42,8 @@ def test1():
 
     output.end_sheet();
     output.end_spreadsheet();
+
+    print stream.str()
 
 # using the wrappers
 def test2():

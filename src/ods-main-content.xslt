@@ -152,14 +152,38 @@
         <table:table-cell table:style-name="cell-style-{@style}"
                           office:value-type="{@type}" 
                           office:value="{.}">
+          <xsl:if test="@column-span">
+            <xsl:attribute name="table:number-columns-spanned">
+              <xsl:value-of select="@column-span"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:number-rows-spanned">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
           <text:p>
             <xsl:value-of select="."/>
           </text:p>
         </table:table-cell>
+        <xsl:if test="@column-span">
+          <xsl:call-template name="generate-covered-cells">
+            <xsl:with-param name="count" select="@column-span - 1"/>
+          </xsl:call-template>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     </xsl:for-each>
   </table:table-row>
+</xsl:template>
+
+<xsl:template name="generate-covered-cells">
+  <xsl:param name="count"/>
+  <xsl:if test="$count > 0">
+    <!-- This can be done using "table:number-columns-repeated" too.. -->
+    <table:covered-table-cell/>
+    <xsl:call-template name="generate-covered-cells">
+      <xsl:with-param name="count" select="$count - 1"/>
+    </xsl:call-template>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="chart">
