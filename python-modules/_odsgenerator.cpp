@@ -53,9 +53,13 @@ BOOST_PYTHON_MODULE(_odsgenerator)
         .def("end_sheet", &ODSGenerator::end_sheet)
         .def("begin_row", &ODSGenerator::begin_row)
         .def("end_row", &ODSGenerator::end_row)
-        .def("add_string", &ODSGenerator::add_cell<const std::string&>)
-        .def("add_number", &ODSGenerator::add_cell<double>)
-        .def("add_chart", &ODSGenerator::add_cell<const Chart&>)
+        .def("add_string", (void (ODSGenerator::*)(const std::string&))
+                           (&ODSGenerator::add_cell<const std::string&>))
+        // XXX error: address of overloaded function with no contextual type information??
+        .def("add_number", (void (ODSGenerator::*)(const double&))
+                           (&ODSGenerator::add_cell<const double&>))
+        .def("add_chart", (void (ODSGenerator::*)(const Chart&))
+                          (&ODSGenerator::add_cell<const Chart&>))
     ;
     
     class_<Spreadsheet>("Spreadsheet",
@@ -84,6 +88,11 @@ BOOST_PYTHON_MODULE(_odsgenerator)
                       init<const CellAddress&,
                            const CellAddress&>())
     ;
+
+    class_<Style>("Style")
+    ;
+
+    def("separator", separator);
     
     class_<Row>("Row", 
                 init<Sheet&>())
@@ -91,6 +100,7 @@ BOOST_PYTHON_MODULE(_odsgenerator)
         .def("add_string", &Row::add_cell<const std::string&>)
         .def("add_number", &Row::add_cell<double>)
         .def("add_chart", &Row::add_cell<const Chart&>)
+        .def("add_style", &Row::add_style)
     ;
     
     class_<Color>("Color", 

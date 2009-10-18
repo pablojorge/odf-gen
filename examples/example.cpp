@@ -54,10 +54,15 @@ void test2()
 
     Sheet sheet1( spreadsheet, "sheet1" );
     
-    Row( sheet1 ) << "x" << "f(x) = x ^ 2" << "f(x) = 2x" << "f(x) = -5x";
+    Style border_bottom( Style::BORDER_BOTTOM );
+
+    Row( sheet1 ) << border_bottom << "x" << separator()
+                  << border_bottom << "f(x) = x ^ 2" 
+                  << border_bottom << "f(x) = 2x" 
+                  << border_bottom << "f(x) = -5x";
  
     for( int x = -10; x <= 10; x++ )
-        Row( sheet1 ) << x << x * x << x * 2 << x * -5;
+        Row( sheet1 ) << x << separator() << x * x << x * 2 << x * -5;
 
     Row( sheet1 ) << AutoChart( "chart1",        // name
                                 Centimeters(14), // width

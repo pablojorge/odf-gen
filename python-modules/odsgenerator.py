@@ -23,7 +23,8 @@ def type_map( value ):
     type_mapping = [
         ([int, float], "number"),
         ([str], "string"),
-        ([Chart, AutoChart], "chart")
+        ([Chart, AutoChart], "chart"),
+        ([Style], "style")
     ]
 
     typestr = reduce(lambda o, p: p[1] if type(value) in p[0] else o, 
