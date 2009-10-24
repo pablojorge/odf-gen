@@ -152,7 +152,7 @@
         <table:table-cell table:style-name="cell-style-{@style}"
                           office:value-type="{@type}" 
                           office:value="{.}">
-          <xsl:if test="@column-span">
+          <xsl:if test="@column-span > 0">
             <xsl:attribute name="table:number-columns-spanned">
               <xsl:value-of select="@column-span"/>
             </xsl:attribute>
@@ -164,7 +164,7 @@
             <xsl:value-of select="."/>
           </text:p>
         </table:table-cell>
-        <xsl:if test="@column-span">
+        <xsl:if test="@column-span > 0">
           <xsl:call-template name="generate-covered-cells">
             <xsl:with-param name="count" select="@column-span - 1"/>
           </xsl:call-template>
