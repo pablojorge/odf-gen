@@ -54,18 +54,27 @@ void test2()
 
     Sheet sheet1( spreadsheet, "sheet1" );
 
-    Row( sheet1 ) << column_span( "functions", 4 );
-    
-    Style border_bottom( Style::BORDER_BOTTOM );
+    const Style title_style( (Style::StyleFlags)(Style::ALIGN_CENTER | 
+                                                 Style::TEXT_BOLD) ),
+                italic( Style::TEXT_ITALIC ),
+                border_bottom( Style::BORDER_BOTTOM );
 
-    Row( sheet1 ) << border_bottom << "x"
-                  << border_bottom << "f(x) = x ^ 2" 
-                  << border_bottom << "f(x) = 2x" 
-                  << border_bottom << "f(x) = -5x";
+    // main title
+    Row( sheet1 ) << title_style << italic << column_span( "Functions", 4 );
  
+    // column titles
+    Row( sheet1 ) << title_style << border_bottom << "x"
+                  << title_style << border_bottom << "f(x) = x ^ 2" 
+                  << title_style << border_bottom << "f(x) = 2x" 
+                  << title_style << border_bottom << "f(x) = -5x";
+ 
+    // column values
     for( int x = -10; x <= 10; x++ )
-        Row( sheet1 ) << x << separator() << x * x << x * 2 << x * -5;
+        Row( sheet1 ) << v_separator
+                      << x << v_separator << x * x << x * 2 << x * -5
+                      << v_separator;
 
+    // chart
     Row( sheet1 ) << AutoChart( "chart1",        // name
                                 Centimeters(14), // width
                                 Centimeters(10), // height

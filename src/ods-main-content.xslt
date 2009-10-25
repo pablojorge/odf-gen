@@ -122,6 +122,56 @@
           </xsl:otherwise>
         </xsl:choose>
       </style:table-cell-properties>
+      <style:paragraph-properties>
+        <xsl:attribute name="fo:text-align">
+          <xsl:choose>
+            <xsl:when test="contains(@style,'align-left')">
+              <xsl:text>begin</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(@style,'align-center')">
+              <xsl:text>center</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(@style,'align-right')">
+              <xsl:text>end</xsl:text>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </style:paragraph-properties>
+      <style:text-properties>
+        <xsl:if test="contains(@style,'text-bold')">
+          <xsl:attribute name="fo:font-weight">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:font-weight-asian">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:font-weight-complex">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="contains(@style,'text-italic')">
+          <xsl:attribute name="fo:font-style">
+            <xsl:text>italic</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:font-style-asian">
+            <xsl:text>italic</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:font-style-complex">
+            <xsl:text>italic</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="contains(@style,'text-underline')">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>solid</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-color">
+            <xsl:text>font-color</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </style:text-properties>
     </style:style>
   </xsl:for-each>
 </office:automatic-styles>

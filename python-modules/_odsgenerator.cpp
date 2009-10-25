@@ -20,7 +20,8 @@ odf-gen: Simple API to generate OpenDocument documents.
 
 #include <sstream>
 #include <boost/python.hpp>
-#include "include/odsgenerator.h"
+
+#include <odfgen/odfgen.h>
 
 using namespace boost::python;
 
@@ -92,8 +93,6 @@ BOOST_PYTHON_MODULE(_odsgenerator)
     class_<Style>("Style")
     ;
 
-    def("separator", &separator);
-    
     class_<Row>("Row", 
                 init<Sheet&>())
         .def("close", &Row::close)

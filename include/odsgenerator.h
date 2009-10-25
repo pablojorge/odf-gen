@@ -303,7 +303,13 @@ public:
           _row( row )
     {}
 
-    friend std::ostream& operator << ( std::ostream&, const CellAddress& );
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        ostream << "'" << _sheet << "'" 
+                << "." << (char)('A' + _column - 1) // XXX
+                << _row;
+        return ostream;
+    }
 
 private:
     std::string _sheet;
@@ -311,13 +317,11 @@ private:
                  _row;
 };
 
+inline
 std::ostream& operator << ( std::ostream &ostream,
                             const CellAddress& address ) 
 {
-    ostream << "'" << address._sheet << "'" 
-            << "." << (char)('A' + address._column - 1) // XXX
-            << address._row;
-    return ostream;
+    return address.operator << (ostream);
 }
 
 class CellRange 
@@ -329,36 +333,46 @@ public:
           _end( end )
     {}
 
-    friend std::ostream& operator << ( std::ostream&, const CellRange& );
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        ostream << _start << ":" << _end;
+        return ostream;
+    }
 
 private:
     CellAddress _start,
                 _end;
 };
 
+inline 
 std::ostream& operator << ( std::ostream &ostream,
                             const CellRange& range ) 
 {
-    ostream << range._start << ":" << range._end;
-    return ostream;
+    return range.operator << (ostream);
 }
 
 class Style
 {
 public:
-    typedef enum {
-        NONE          = 0x0000,
-        BORDER_BOTTOM = 0x0001,
-        BORDER_LEFT   = 0x0002,
-        BORDER_RIGHT  = 0x0004,
-        BORDER_TOP    = 0x0008
-    } StyleFlags ;
+    enum StyleFlags {
+        NONE           = 0,
+        BORDER_BOTTOM  = (1 <<  0),
+        BORDER_LEFT    = (1 <<  1),
+        BORDER_RIGHT   = (1 <<  2),
+        BORDER_TOP     = (1 <<  3),
+        ALIGN_LEFT     = (1 <<  4),
+        ALIGN_CENTER   = (1 <<  5),
+        ALIGN_RIGHT    = (1 <<  6),
+        TEXT_BOLD      = (1 <<  7),
+        TEXT_ITALIC    = (1 <<  8),
+        TEXT_UNDERLINE = (1 <<  9),
+    };
 
-    Style( StyleFlags flags = NONE ) 
+    Style( mili::bitwise_enum< StyleFlags > flags = NONE ) 
         : _flags( flags )
     {}
 
-    Style& operator = ( StyleFlags flags )
+    Style& operator = ( mili::bitwise_enum< StyleFlags > flags )
     {
         _flags = flags;
         return *this;
@@ -370,24 +384,51 @@ public:
         return *this;
     }
 
-    friend std::ostream& operator << ( std::ostream&, const Style& );
+    bool operator ! () const
+    {
+        return !_flags.has_bits();
+    }
+
+    bool operator & ( mili::bitwise_enum< StyleFlags > flags ) const
+    {
+        return (_flags & flags).has_bits();
+    }
+
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        if( this->operator & (BORDER_BOTTOM) )
+            ostream << "border-bottom,";
+        if( this->operator & (BORDER_LEFT) )
+            ostream << "border-left,";
+        if( this->operator & (BORDER_RIGHT) )
+            ostream << "border-right,";
+        if( this->operator & (BORDER_TOP) )
+            ostream << "border-top,";
+        if( this->operator & (ALIGN_LEFT) )
+            ostream << "align-left,";
+        if( this->operator & (ALIGN_CENTER) )
+            ostream << "align-center,";
+        if( this->operator & (ALIGN_RIGHT) )
+            ostream << "align-right,";
+        if( this->operator & (TEXT_BOLD) )
+            ostream << "text-bold,";
+        if( this->operator & (TEXT_ITALIC) )
+            ostream << "text-italic,";
+        if( this->operator & (TEXT_UNDERLINE)  )
+            ostream << "text-underline,";
+        
+        return ostream;
+    }
 
 private:
     mili::bitwise_enum< StyleFlags > _flags;
 };
 
+inline
 std::ostream& operator << ( std::ostream &ostream,
                             const Style& style ) 
 {
-    if( (style._flags & style.BORDER_BOTTOM).has_bits() )
-        ostream << "border-bottom,";
-    if( (style._flags & style.BORDER_LEFT).has_bits() )
-        ostream << "border-left,";
-    if( (style._flags & style.BORDER_RIGHT).has_bits() )
-        ostream << "border-right,";
-    if( (style._flags & style.BORDER_TOP).has_bits() )
-        ostream << "border-top,";
-    return ostream;
+    return style.operator << (ostream);
 }
 
 template < class T >
@@ -433,6 +474,9 @@ public:
     
     void close_()
     {
+        if( !!_style )
+            add_cell( "" );
+
         _generator.end_row();
     }
     
@@ -520,7 +564,7 @@ private:
     TagHandler< Row > _handler;
 };
 
-inline Style separator() { return Style( Style::BORDER_LEFT ); }
+static const Style v_separator( Style::BORDER_LEFT );
 
 class Color
 {
@@ -539,7 +583,17 @@ public:
           _blue( color )
     {}
 
-    friend std::ostream& operator << ( std::ostream&, const Color& );
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        ostream << "#" 
+                << std::hex 
+                << std::setfill('0') 
+                << std::setw(2) << static_cast< int >( _red )
+                << std::setw(2) << static_cast< int >( _green )
+                << std::setw(2) << static_cast< int >( _blue )
+                << std::dec;
+        return ostream;
+    }
 
 private:
     unsigned char _red,
@@ -547,16 +601,10 @@ private:
                   _blue;
 };
 
+inline
 std::ostream& operator << ( std::ostream &ostream, const Color& color ) 
 {
-    ostream << "#" 
-            << std::hex 
-            << std::setfill('0') 
-            << std::setw(2) << static_cast< int >( color._red )
-            << std::setw(2) << static_cast< int >( color._green )
-            << std::setw(2) << static_cast< int >( color._blue )
-            << std::dec;
-    return ostream;
+    return color.operator << (ostream);
 }
 
 class ColorGenerator
@@ -632,7 +680,15 @@ public:
           _color( color )
     {}
 
-    friend std::ostream& operator << ( std::ostream&, const Series& );
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        ostream << "<series name-address=\"" << _name << "\""
+                << "        x-range=\"" << _domain << "\""
+                << "        y-range=\"" << _values << "\""
+                << "        color=\"" << _color << "\""
+                << "/>";
+        return ostream;
+    }
 
 private:
     CellAddress _name;
@@ -641,15 +697,11 @@ private:
     Color _color;
 };
 
+inline
 std::ostream& operator << ( std::ostream &ostream,
                             const Series& series ) 
 {
-    ostream << "<series name-address=\"" << series._name << "\""
-            << "        x-range=\"" << series._domain << "\""
-            << "        y-range=\"" << series._values << "\""
-            << "        color=\"" << series._color << "\""
-            << "/>";
-    return ostream;
+    return series.operator << (ostream);
 }
 
 class Chart 
@@ -693,7 +745,35 @@ public:
         _y_axis_label = y_axis_label;
     }
 
-    friend std::ostream& operator << ( std::ostream&, const Chart& );
+    std::ostream& operator << ( std::ostream& ostream ) const
+    {
+        ostream << "<chart name=\"" << _name << "\""
+                << "       width=\"" << _width << "\""
+                << "       height=\"" << _height << "\""
+                << "       title=\"" << _title << "\""
+                << "       subtitle=\"" << _subtitle << "\""
+                << "       x-axis-label=\"" << _x_axis_label << "\""
+                << "       y-axis-label=\"" << _y_axis_label << "\""
+                << "       range=\"";
+        
+        for( std::list< CellRange >::const_iterator 
+             it  = _range_list.begin();
+             it != _range_list.end();
+             it++ )
+            ostream << *it << ";";
+        
+        ostream << "\">";
+        
+        for( std::list< Series >::const_iterator 
+             it  = _series_list.begin();
+             it != _series_list.end();
+             it++ )
+            ostream << *it;
+        
+        ostream << "</chart>";
+        
+        return ostream;
+    }
 
 private:
     std::string _name,
@@ -709,35 +789,11 @@ private:
 
 MAP_ODS_TYPE(Chart, object);
 
+inline
 std::ostream& operator << ( std::ostream &ostream,
                             const Chart& chart ) 
 {
-    ostream << "<chart name=\"" << chart._name << "\""
-            << "       width=\"" << chart._width << "\""
-            << "       height=\"" << chart._height << "\""
-            << "       title=\"" << chart._title << "\""
-            << "       subtitle=\"" << chart._subtitle << "\""
-            << "       x-axis-label=\"" << chart._x_axis_label << "\""
-            << "       y-axis-label=\"" << chart._y_axis_label << "\""
-            << "       range=\"";
-
-    for( std::list< CellRange >::const_iterator 
-         it  = chart._range_list.begin();
-         it != chart._range_list.end();
-         it++ )
-        ostream << *it << ";";
-
-    ostream << "\">";
-
-    for( std::list< Series >::const_iterator 
-         it  = chart._series_list.begin();
-         it != chart._series_list.end();
-         it++ )
-        ostream << *it;
-
-    ostream << "</chart>";
-    
-    return ostream;
+    return chart.operator << (ostream);
 }
 
 class AutoChart : public Chart

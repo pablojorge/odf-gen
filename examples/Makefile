@@ -2,8 +2,6 @@ include ../Config.mk
 
 ALL = example
 
-CFLAGS += -I $(INC_PREFIX)/$(INC_DIR)
-
 all: $(ALL)
 
 test: example
