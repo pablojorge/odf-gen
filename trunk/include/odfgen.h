@@ -27,7 +27,7 @@ namespace odfgen
 #endif
 
 #ifndef NO_ODSGENERATOR
-#   include <odsgenerator.h>
+#   include "odsgenerator.h"
 #endif
 
 #ifdef ODFGEN_NAMESPACE
