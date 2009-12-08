@@ -193,6 +193,9 @@
   <table:table-row>
     <xsl:for-each select="cell">
     <xsl:choose>
+      <xsl:when test="@covered='true'">
+        <table:covered-table-cell/>
+      </xsl:when>
       <xsl:when test="@type='object'">
         <table:table-cell>
           <xsl:apply-templates select="."/>
@@ -202,12 +205,26 @@
         <table:table-cell table:style-name="cell-style-{@style}"
                           office:value-type="{@type}" 
                           office:value="{.}">
-          <xsl:if test="@column-span > 0">
+          <xsl:if test="@column-span > 0 or @row-span > 0">
             <xsl:attribute name="table:number-columns-spanned">
-              <xsl:value-of select="@column-span"/>
+              <xsl:choose>
+                <xsl:when test="@column-span > 0">
+                  <xsl:value-of select="@column-span"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>1</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="table:number-rows-spanned">
-              <xsl:text>1</xsl:text>
+              <xsl:choose>
+                <xsl:when test="@row-span > 0">
+                  <xsl:value-of select="@row-span"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>1</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
           <text:p>

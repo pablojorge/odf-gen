@@ -60,10 +60,11 @@ void test2()
                 border_bottom( Style::BORDER_BOTTOM );
 
     // main title
-    Row( sheet1 ) << title_style << italic << column_span( "Functions", 4 );
+    Row( sheet1 ) << title_style << border_bottom << row_span( "x", 2 )
+                  << title_style << italic << column_span( "Functions", 3 );
  
     // column titles
-    Row( sheet1 ) << title_style << border_bottom << "x"
+    Row( sheet1 ) << covered_cell << v_separator
                   << title_style << border_bottom << "f(x) = x ^ 2" 
                   << title_style << border_bottom << "f(x) = 2x" 
                   << title_style << border_bottom << "f(x) = -5x";
