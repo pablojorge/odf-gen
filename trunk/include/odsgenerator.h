@@ -103,23 +103,13 @@ public:
 
     template < class T >
     void begin_cell( const Style& style,
-                     unsigned int column_span )
+                     unsigned int column_span,
+                     unsigned int row_span )
     {
         _ostream << "<cell style=\"" << style << "\"" 
                  << "      column-span=\"" << column_span << "\""
+                 << "      row-span=\"" << row_span << "\""
                  << "      type=\"" << ODSType< T >::convert() << "\">";
-    }
-
-    template < class T >
-    void begin_cell( const Style& style )
-    {
-        begin_cell< T >( style, 0 );
-    }
-
-    template < class T >
-    void begin_cell()
-    {
-        begin_cell< T >( Style(), 0 );
     }
 
     void end_cell() 
@@ -135,27 +125,20 @@ public:
 
     template < class T >
     void add_cell( const T& value,
-                   const Style& style,
-                   unsigned int column_span )
+                   const Style& style = Style(),
+                   unsigned int column_span = 0,
+                   unsigned int row_span = 0 )
     {
-        begin_cell< T >( style, column_span );
+        begin_cell< T >( style, column_span, row_span );
         add_value( value );
         end_cell();
     }
 
-    template < class T >
-    void add_cell( const T& value,
-                   const Style& style )
+    void add_covered_cell()
     {
-        add_cell( value, style, 0 );
+        _ostream << "<cell covered=\"true\"/>";
     }
-        
-    template < class T >
-    void add_cell( const T& value )
-    {
-        add_cell( value, Style(), 0 );
-    }
-        
+
 private:
     std::ostream &_ostream;
 };
@@ -431,11 +414,11 @@ std::ostream& operator << ( std::ostream &ostream,
     return style.operator << (ostream);
 }
 
-template < class T >
-class ColumnSpan
+template < class K, class T >
+class Span
 {
 public:
-    ColumnSpan( const T& value, unsigned int count )
+    Span( const T& value, unsigned int count )
         : _value( value ),
           _count( count )
     {}
@@ -448,10 +431,40 @@ private:
     unsigned int _count;
 };
 
+class ColumnK {};
+class RowK {};
+
+template < class T >
+class ColumnSpan : public Span< ColumnK, T >
+{
+public:
+    ColumnSpan( const T& value, unsigned int count )
+        : Span< ColumnK, T >( value, count )
+    {}
+};
+
+template < class T >
+class RowSpan : public Span< RowK, T >
+{
+public:
+    RowSpan( const T& value, unsigned int count )
+        : Span< RowK, T >( value, count )
+    {}
+};
+
+class CoveredCell {};
+static const CoveredCell covered_cell = CoveredCell();
+
 template < class T >
 inline ColumnSpan< T > column_span( T value, unsigned int count )
 {
     return ColumnSpan< T >( value, count );
+}
+
+template < class T >
+inline RowSpan< T > row_span( T value, unsigned int count )
+{
+    return RowSpan< T >( value, count );
 }
 
 class Row 
@@ -492,10 +505,11 @@ public:
     
     template < class T >
     CellAddress add_cell( const T& value,
-                          unsigned int column_span )
+                          unsigned int column_span = 0,
+                          unsigned int row_span = 0 )
     {
         // add the cell using the preset style
-        _generator.add_cell( value, _style, column_span );
+        _generator.add_cell( value, _style, column_span, row_span );
 
         // reset style
         _style = Style::NONE;
@@ -521,12 +535,6 @@ public:
         return address;
     }
 
-    template < class T >
-    CellAddress add_cell( const T& value )
-    {
-        return add_cell( value, 0 );
-    }
-
     void add_style( const Style& style )
     {
         _style |= style;
@@ -550,6 +558,21 @@ public:
     {
         add_cell( spanned_value.value(),
                   spanned_value.count() );
+        return *this;
+    }
+
+    template < class T >
+    Row& operator << ( const RowSpan< T >& spanned_value )
+    {
+        add_cell( spanned_value.value(),
+                  0,
+                  spanned_value.count() );
+        return *this;
+    }
+
+    Row& operator << ( const CoveredCell& covered )
+    {
+        _generator.add_covered_cell();
         return *this;
     }
 
