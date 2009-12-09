@@ -5,7 +5,7 @@ LFLAGS += -lboost_python-mt
 
 all: $(ALL)
 
-_odsgenerator.o: _odsgenerator.cpp ../include/odsgenerator.h
+_odsgenerator.o: _odsgenerator.cpp ../odfgen/odsgenerator.h
 
 %.o: %.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
