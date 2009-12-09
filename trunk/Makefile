@@ -1,6 +1,6 @@
 include Config.mk
 
-PY_MODULES = python-modules
+PY_MODULES = bindings/python
 TARGET = $(PY_MODULES)
 
 all: $(TARGET)
@@ -14,7 +14,7 @@ $(TARGET):
 
 install-headers:
 	mkdir -p $(INC_PREFIX)/$(INC_DIR)
-	cp -av include/*.h $(INC_PREFIX)/$(INC_DIR)
+	cp -av odfgen/*.h $(INC_PREFIX)/$(INC_DIR)
 
 uninstall-headers:
 	rm -rf $(INC_PREFIX)/$(INC_DIR)
