@@ -29,7 +29,7 @@ uninstall-python-modules:
 install-bin:
 	mkdir -p $(LIB_PREFIX)/$(LIB_DIR)
 	cp -av src/*.py src/*.xslt $(LIB_PREFIX)/$(LIB_DIR)
-	cp odsgen $(BIN_PREFIX)
+	cp src/odsgen $(BIN_PREFIX)
 
 uninstall-bin:
 	rm -rf $(LIB_PREFIX)/$(LIB_DIR)
