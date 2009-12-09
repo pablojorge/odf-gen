@@ -22,33 +22,7 @@ odf-gen: Simple API to generate OpenDocument documents.
 
 #include <odfgen/odfgen.h>
 
-// using ODSGenerator directly
-void test1() 
-{
-    ODSGenerator output;
- 
-    output.begin_spreadsheet();
-    output.begin_sheet( "test" );
-    
-    output.begin_row();
-    output.add_cell( "x" );
-    output.add_cell( "x * 2" );
-    output.end_row();
- 
-    for( int i = 0; i < 5; i++ )
-    {
-        output.begin_row();
-        output.add_cell( i );
-        output.add_cell( i * 2 );
-        output.end_row();
-    }
-
-    output.end_sheet();
-    output.end_spreadsheet();
-}
-
-// using the wrappers
-void test2() 
+void test() 
 {
     Spreadsheet spreadsheet;
 
@@ -84,6 +58,6 @@ void test2()
 
 int main( int argc, char const* argv[] )
 {
-    test2();
+    test();
     return 0;
 }

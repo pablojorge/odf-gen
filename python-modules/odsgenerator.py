@@ -54,9 +54,6 @@ def append_row( self, values ):
         for value in values:
             row.add_cell( value )
 
-# ODSGenerator patching:
-ODSGenerator.add_cell = add_cell
-
 # Spreadsheet patching:
 Spreadsheet.__enter__ = scope_enter
 Spreadsheet.__exit__ = scope_exit

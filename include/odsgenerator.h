@@ -57,187 +57,80 @@ struct ODSType<char[N]>
     static const char* convert() { return "string"; }
 };
 
-class Style;
-
-std::ostream& operator << ( std::ostream &ostream,
-                            const Style& style );
-
-class ODSGenerator 
+class Element
 {
 public:
-    ODSGenerator( std::ostream &ostream = std::cout ) 
-        : _ostream( ostream )
-    {
-        _ostream << "<?xml version=\"1.0\"?>";
-    }
-
-    void begin_spreadsheet()
-    {
-        _ostream << "<spreadsheet>";
-    }
-
-    void end_spreadsheet()
-    {
-        _ostream << "</spreadsheet>";
-    }
-        
-    void begin_sheet( const std::string &name )
-    {
-        _ostream << "<sheet name=\"" << name << "\">";
-    }
-    
-    void end_sheet() 
-    {
-        _ostream << "</sheet>";
-    }
- 
-    void begin_row()
-    {
-        _ostream << "<row>";
-    }
-    
-    void end_row() 
-    {
-        _ostream << "</row>";
-    }
-
-    template < class T >
-    void begin_cell( const Style& style,
-                     unsigned int column_span,
-                     unsigned int row_span )
-    {
-        _ostream << "<cell style=\"" << style << "\"" 
-                 << "      column-span=\"" << column_span << "\""
-                 << "      row-span=\"" << row_span << "\""
-                 << "      type=\"" << ODSType< T >::convert() << "\">";
-    }
-
-    void end_cell() 
-    {
-        _ostream << "</cell>";
-    }
-
-    template < class T >
-    void add_value( const T& value )
-    {
-        _ostream << value;
-    }
-
-    template < class T >
-    void add_cell( const T& value,
-                   const Style& style = Style(),
-                   unsigned int column_span = 0,
-                   unsigned int row_span = 0 )
-    {
-        begin_cell< T >( style, column_span, row_span );
-        add_value( value );
-        end_cell();
-    }
-
-    void add_covered_cell()
-    {
-        _ostream << "<cell covered=\"true\"/>";
-    }
-
-private:
-    std::ostream &_ostream;
-};
-
-template < class Container >
-class TagHandler
-{
-public:
-    TagHandler( Container& container ) 
-        : _container( container ),
+    Element( std::ostream &ostream = std::cout )
+        : _ostream( ostream ),
           _closed( false )
-    {
-        open();
-    }
+    {}
+
+    Element( Element& other )
+        : _ostream( other._ostream ),
+          _closed( false )
+    {}
     
-    ~TagHandler()
-    {
-        close();
-    } 
-    
-    void open() {
-        _container.open_();
-    }
-    
+    virtual ~Element()
+    {}
+
     void close() {
         if( !_closed ) {
-            _container.close_();
+            this->close_();
             _closed = true;
         }
     }
+
+protected:
+    virtual void close_() = 0; 
     
+protected:
+    std::ostream &_ostream;
 private:
-    Container& _container;
     bool _closed;
 };
 
-class Spreadsheet 
+class Spreadsheet : public Element
 {
 public:
     Spreadsheet( std::ostream &ostream = std::cout )
-        : _generator( ostream ),
-          _handler( *this )
-    {}
-    
-    void open_()
+        : Element( ostream )
     {
-        _generator.begin_spreadsheet();
+        _ostream << "<?xml version=\"1.0\"?>"
+                 << "<spreadsheet>";
     }
     
-    void close_()
+    virtual void close_()
     {
-        _generator.end_spreadsheet();
+        _ostream << "</spreadsheet>";
     }
     
-    void close()
+    ~Spreadsheet()
     {
-        _handler.close();
+        close();
     }
-
-    ODSGenerator &generator()
-    {
-        return _generator;
-    }
-    
-private:
-    ODSGenerator _generator;
-    TagHandler< Spreadsheet > _handler;
 };
 
-class Sheet 
+class Sheet : public Element
 {
 public:
     Sheet( Spreadsheet &spreadsheet, 
            const std::string &name )
-        : _generator( spreadsheet.generator() ),
+        : Element( spreadsheet ),
           _name( name ),
           _columns( 0 ),
-          _rows( 0 ),
-          _handler( *this )
-    {}
-    
-    void open_()
+          _rows( 0 )
     {
-        _generator.begin_sheet( _name );
+        _ostream << "<sheet name=\"" << _name << "\">";
     }
     
-    void close_()
+    virtual void close_()
     {
-        _generator.end_sheet();
+        _ostream << "</sheet>";
     }
-
-    void close()
+    
+    ~Sheet()
     {
-        _handler.close();
-    }
-
-    ODSGenerator &generator()
-    {
-        return _generator;
+        close();
     }
 
     const char* get_name() const
@@ -266,13 +159,10 @@ public:
     }
     
 private:
-    ODSGenerator &_generator;
     std::string _name;
 
     unsigned int _columns,
                  _rows;
-
-    TagHandler< Sheet > _handler;
 };
 
 class CellAddress 
@@ -467,49 +357,64 @@ inline RowSpan< T > row_span( T value, unsigned int count )
     return RowSpan< T >( value, count );
 }
 
-class Row 
+class Row : public Element
 {
 public:
     Row( Sheet &sheet )
-        : _sheet( sheet ),
-          _generator( _sheet.generator() ),
+        : Element( sheet ),
+          _sheet( sheet ),
           _column( 0 ),
-          _row( 0 ),
-          _handler( *this )
-    {}
-    
-    void open_()
+          _row( 0 )
     {
         _sheet.add_row();
         _row = _sheet.get_rows();
-        _generator.begin_row();
+        _ostream << "<row>";
     }
     
-    void close_()
+    virtual void close_()
     {
         if( !!_style )
             add_cell( "" );
 
-        _generator.end_row();
-    }
-    
-    void close()
-    {
-        _handler.close();
+        _ostream << "</row>";
     }
 
-    ODSGenerator &generator()
+    ~Row()
     {
-        return _generator;
+        close();
     }
     
     template < class T >
+    void begin_cell( const Style& style,
+                     unsigned int column_span,
+                     unsigned int row_span )
+    {
+        _ostream << "<cell style=\"" << style << "\"" 
+                 << "      column-span=\"" << column_span << "\""
+                 << "      row-span=\"" << row_span << "\""
+                 << "      type=\"" << ODSType< T >::convert() << "\">";
+    }
+
+    void end_cell() 
+    {
+        _ostream << "</cell>";
+    }
+
+    template < class T >
+    void add_value( const T& value )
+    {
+        _ostream << value;
+    }
+
+    template < class T >
     CellAddress add_cell( const T& value,
-                          unsigned int column_span = 0,
-                          unsigned int row_span = 0 )
+                          unsigned int column_span,
+                          unsigned int row_span )
     {
         // add the cell using the preset style
-        _generator.add_cell( value, _style, column_span, row_span );
+        begin_cell< T >( _style, column_span, row_span );
+        add_value( value );
+        end_cell();
 
         // reset style
         _style = Style::NONE;
@@ -535,6 +440,12 @@ public:
         return address;
     }
 
+    template < class T >
+    CellAddress add_cell( const T& value )
+    {
+        return add_cell( value, 0, 0 );
+    }
+    
     void add_style( const Style& style )
     {
         _style |= style;
@@ -572,19 +483,16 @@ public:
 
     Row& operator << ( const CoveredCell& covered )
     {
-        _generator.add_covered_cell();
+        _ostream << "<cell covered=\"true\"/>";
         return *this;
     }
 
 private:
     Sheet &_sheet;
-    ODSGenerator &_generator;
 
     Style _style;
     unsigned int _column,
                  _row;
-
-    TagHandler< Row > _handler;
 };
 
 static const Style v_separator( Style::BORDER_LEFT );

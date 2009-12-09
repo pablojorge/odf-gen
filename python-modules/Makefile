@@ -1,7 +1,7 @@
 ALL = _odsgenerator.so
 
 CFLAGS += -I /usr/include/python2.6/ -I ..
-LFLAGS += -lboost_python
+LFLAGS += -lboost_python-mt
 
 all: $(ALL)
 
