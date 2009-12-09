@@ -468,7 +468,8 @@ public:
     Row& operator << ( const ColumnSpan< T >& spanned_value )
     {
         add_cell( spanned_value.value(),
-                  spanned_value.count() );
+                  spanned_value.count(),
+                  0 );
         return *this;
     }
 
