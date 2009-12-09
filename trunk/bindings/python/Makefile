@@ -2,7 +2,7 @@ ALL = _odsgenerator.so
 
 ROOT = ../..
 
-CFLAGS += -I /usr/include/python2.6/ -I $(ROOT)
+CFLAGS += -I /usr/include/python2.6/ -I $(ROOT)/odfgen
 LFLAGS += -lboost_python-mt
 
 all: $(ALL)

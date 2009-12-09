@@ -20,7 +20,7 @@ odf-gen: Simple API to generate OpenDocument documents.
 
 #include <iostream>
 
-#include <odfgen/odfgen.h>
+#include "odfgen.h"
 
 void test() 
 {
@@ -28,8 +28,7 @@ void test()
 
     Sheet sheet1( spreadsheet, "sheet1" );
 
-    const Style title_style( (Style::StyleFlags)(Style::ALIGN_CENTER | 
-                                                 Style::TEXT_BOLD) ),
+    const Style title_style( Style::ALIGN_CENTER | Style::TEXT_BOLD ),
                 italic( Style::TEXT_ITALIC ),
                 border_bottom( Style::BORDER_BOTTOM );
 
