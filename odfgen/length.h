@@ -18,19 +18,47 @@ odf-gen: Simple API to generate OpenDocument documents.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ODSGENERATOR_H
-#define ODSGENERATOR_H
+#ifndef LENGTH_H
+#define LENGTH_H
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
-#include "spreadsheet.h"
-#include "sheet.h"
-#include "row.h"
-#include "chart.h"
+class Length
+{
+public:
+    Length( unsigned int value )
+        : _value( value )
+    {}
+    
+    virtual const char* unit() const
+    {
+        return "";
+    }
+    
+    std::string str() const
+    {
+        std::stringstream stream;
+        stream << _value << this->unit();
+        return stream.str();
+    }
 
-#include "style.h"
+private:
+    unsigned int _value;
+};
 
-static const Style v_separator( Style::BORDER_LEFT );
+class Centimeters : public Length
+{
+public:
+    Centimeters( unsigned int value )
+        : Length( value )
+    {}
+    
+    const char* unit() const
+    {
+        return "cm";
+    }
+};
 
-#endif // ODSGENERATOR_H
+#endif // LENGTH_H

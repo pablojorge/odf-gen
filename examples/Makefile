@@ -10,7 +10,7 @@ test: example
 
 example: example.cpp ../odfgen/odsgenerator.h
 
-CFLAGS += -I ..
+CFLAGS += -I ../odfgen
 
 %: %.cpp
 	$(CXX) $(CFLAGS) $< -o $@

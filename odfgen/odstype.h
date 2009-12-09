@@ -18,19 +18,33 @@ odf-gen: Simple API to generate OpenDocument documents.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ODSGENERATOR_H
-#define ODSGENERATOR_H
+#ifndef ODSTYPE_H
+#define ODSTYPE_H
 
-#include <iostream>
-#include <string>
+template <class T>
+struct ODSType
+{
+    static const char* convert() { return "float"; }
+};
 
-#include "spreadsheet.h"
-#include "sheet.h"
-#include "row.h"
-#include "chart.h"
+template <class T>
+struct ODSType<const T&> : public ODSType<T>
+{};
 
-#include "style.h"
+#define MAP_ODS_TYPE(cpptype, odstype) \
+template<> \
+struct ODSType<cpptype> \
+{ \
+    static const char* convert() { return #odstype; } \
+};
 
-static const Style v_separator( Style::BORDER_LEFT );
+MAP_ODS_TYPE(const char*, string);
+MAP_ODS_TYPE(std::string, string);
 
-#endif // ODSGENERATOR_H
+template <int N>
+struct ODSType<char[N]>
+{
+    static const char* convert() { return "string"; }
+};
+
+#endif // ODSTYPE_H

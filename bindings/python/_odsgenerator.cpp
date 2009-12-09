@@ -18,10 +18,13 @@ odf-gen: Simple API to generate OpenDocument documents.
     along with odf-gen.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <sstream>
+#include <fstream>
+
 #include <boost/python.hpp>
 
-#include <odfgen/odfgen.h>
+#include "odsgenerator.h"
 
 using namespace boost::python;
 
