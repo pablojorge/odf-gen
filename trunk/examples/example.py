@@ -20,33 +20,7 @@ import sys
 
 from odfgen.odsgenerator import *
 
-# using ODSGenerator directly
-def test1():
-    stream = StringStream()
-
-    output = ODSGenerator(stream)
- 
-    output.begin_spreadsheet();
-    output.begin_sheet( "test" );
-    
-    output.begin_row();
-    output.add_cell( "x" );
-    output.add_cell( "x * 2" );
-    output.end_row();
- 
-    for i in range( 5 ):
-        output.begin_row();
-        output.add_cell( i );
-        output.add_cell( i * 2 );
-        output.end_row();
-
-    output.end_sheet();
-    output.end_spreadsheet();
-
-    print stream.str()
-
-# using the wrappers
-def test2():
+def test():
     stream = StringStream()
 
     with Spreadsheet( stream ) as spreadsheet:
@@ -64,4 +38,4 @@ def test2():
     print stream.str()
 
 if __name__ == "__main__":
-    test2()
+    test()

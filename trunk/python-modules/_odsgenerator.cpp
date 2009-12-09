@@ -46,31 +46,16 @@ BOOST_PYTHON_MODULE(_odsgenerator)
         .def("close", &std::ofstream::close) 
     ;
 
-    class_<ODSGenerator>("ODSGenerator", 
-                         init<std::ostream&>())
-        .def("begin_spreadsheet", &ODSGenerator::begin_spreadsheet)
-        .def("end_spreadsheet", &ODSGenerator::end_spreadsheet)
-        .def("begin_sheet", &ODSGenerator::begin_sheet)
-        .def("end_sheet", &ODSGenerator::end_sheet)
-        .def("begin_row", &ODSGenerator::begin_row)
-        .def("end_row", &ODSGenerator::end_row)
-        .def("add_string", (void (ODSGenerator::*)(const std::string&))
-                           (&ODSGenerator::add_cell<const std::string&>))
-        // XXX error: address of overloaded function with no contextual type information??
-        .def("add_number", (void (ODSGenerator::*)(const double&))
-                           (&ODSGenerator::add_cell<const double&>))
-        .def("add_chart", (void (ODSGenerator::*)(const Chart&))
-                          (&ODSGenerator::add_cell<const Chart&>))
-    ;
-    
-    class_<Spreadsheet>("Spreadsheet",
-                        init<std::ostream&>())
+    class_<Spreadsheet,
+           boost::noncopyable>("Spreadsheet",
+                               init<std::ostream&>())
         .def("close", &Spreadsheet::close)
     ;
     
-    class_<Sheet>("Sheet", 
-                  init<Spreadsheet&, 
-                       const std::string&>())
+    class_<Sheet,
+           boost::noncopyable>("Sheet", 
+                               init<Spreadsheet&, 
+                                    const std::string&>())
         .def("close", &Sheet::close)
         .def("get_name", &Sheet::get_name)
         .def("get_columns", &Sheet::get_columns)
@@ -93,8 +78,9 @@ BOOST_PYTHON_MODULE(_odsgenerator)
     class_<Style>("Style")
     ;
 
-    class_<Row>("Row", 
-                init<Sheet&>())
+    class_<Row,
+           boost::noncopyable>("Row", 
+                               init<Sheet&>())
         .def("close", &Row::close)
         .def("add_string", (CellAddress (Row::*)(const std::string&))
                            (&Row::add_cell<const std::string&>))
