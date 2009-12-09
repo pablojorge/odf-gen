@@ -8,7 +8,9 @@ test: example
 	./example > test.xml
 	odsgen test.xml test.ods
 
-example: example.cpp ../include/odsgenerator.h
+example: example.cpp ../odfgen/odsgenerator.h
+
+CFLAGS += -I ..
 
 %: %.cpp
 	$(CXX) $(CFLAGS) $< -o $@
