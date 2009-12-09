@@ -14,7 +14,7 @@ $(TARGET):
 
 install-headers:
 	mkdir -p $(INC_PREFIX)/$(INC_DIR)
-	cp -av odfgen/*.h $(INC_PREFIX)/$(INC_DIR)
+	cp -av include/*.h $(INC_PREFIX)/$(INC_DIR)
 
 uninstall-headers:
 	rm -rf $(INC_PREFIX)/$(INC_DIR)
