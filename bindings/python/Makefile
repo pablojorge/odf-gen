@@ -1,11 +1,13 @@
 ALL = _odsgenerator.so
 
-CFLAGS += -I /usr/include/python2.6/ -I ..
+ROOT = ../..
+
+CFLAGS += -I /usr/include/python2.6/ -I $(ROOT)
 LFLAGS += -lboost_python-mt
 
 all: $(ALL)
 
-_odsgenerator.o: _odsgenerator.cpp ../odfgen/odsgenerator.h
+_odsgenerator.o: _odsgenerator.cpp $(ROOT)/odfgen/odsgenerator.h
 
 %.o: %.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
