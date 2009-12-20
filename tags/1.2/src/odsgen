@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "usage: `basename $0` input.xml output.ods"
+    exit
+fi
+
+python "/usr/local/lib/odfgen/odsgen.py" $1 $2
