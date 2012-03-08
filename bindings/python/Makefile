@@ -2,8 +2,10 @@ ALL = _odsgenerator.so
 
 ROOT = ../..
 
-CFLAGS += -I /usr/include/python2.6/ -I $(ROOT)/include
-LFLAGS += -lboost_python-mt-py26
+include $(ROOT)/Config.mk
+
+CFLAGS += $(PY_INCLUDE) -I $(ROOT)/include
+LFLAGS += $(PY_LIBS) -lboost_python
 
 all: $(ALL)
 
@@ -13,7 +15,7 @@ _odsgenerator.o: _odsgenerator.cpp $(ROOT)/include/odsgenerator.h
 	$(CXX) $(CFLAGS) -c $< -o $@ -fpic -fPIC
     
 %.so: %.o
-	$(CXX) $(LFLAGS) -shared -o $@ -fpic -fPIC $< 
+	$(CXX) -shared -o $@ -fpic -fPIC $< $(LFLAGS)
 
 clean:
 	rm -rf $(ALL) *.o *.pyc
