@@ -70,6 +70,11 @@ public:
         return *this;
     }
 
+    Style operator | ( const Style& other ) const
+    {
+        return Style(_flags | other._flags);
+    }
+
     bool operator ! () const
     {
         return !_flags.has_bits();

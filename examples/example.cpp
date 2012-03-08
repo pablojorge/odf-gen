@@ -40,7 +40,9 @@ void test()
 
     Sheet sheet1( spreadsheet, "sheet1" );
 
-    const Style title_style( Style::ALIGN_CENTER | Style::TEXT_BOLD ),
+    const Style centered( Style::ALIGN_CENTER ),
+                bold( Style::TEXT_BOLD ),
+                title_style( centered | bold ),
                 italic( Style::TEXT_ITALIC ),
                 border_bottom( Style::BORDER_BOTTOM );
 
