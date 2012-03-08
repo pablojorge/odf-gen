@@ -1,0 +1,6 @@
+REQUIREMENTS
+ * python-dev
+ * libboost-python-dev
+ * xsltproc
+
+$ sudo apt-get install python-dev libboost-python-dev xsltproc
