@@ -1,6 +1,9 @@
-REQUIREMENTS
+REQUIREMENTS:
+
  * python-dev
  * libboost-python-dev
  * xsltproc
 
-$ sudo apt-get install python-dev libboost-python-dev xsltproc
+    $ sudo apt-get install python-dev libboost-python-dev xsltproc
+
+ * MiLi (Download and install from: http://code.google.com/p/mili/)
